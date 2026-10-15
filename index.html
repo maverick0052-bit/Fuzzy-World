@@ -1,0 +1,121 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#faf8f6">
+  <title>Fuzyy World ♡</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <main class="page">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Our Little World home">
+        <span class="brand-heart">♡</span>
+        <span>our little world</span>
+      </a>
+      <span class="live-label"><span class="live-dot"></span> just us two</span>
+    </header>
+
+    <section id="auth-panel" class="auth-panel panel">
+      <p class="eyebrow">A LITTLE SPACE FOR US</p>
+      <h1>Closer, even<br>when we're apart.</h1>
+      <p class="muted">A private little corner for you and me.</p>
+
+      <div class="auth-tabs">
+        <button id="login-tab" class="tab active" type="button">Log in</button>
+        <button id="signup-tab" class="tab" type="button">Create account</button>
+      </div>
+
+      <form id="auth-form">
+        <label for="email">Email address</label>
+        <input id="email" type="email" autocomplete="email"
+               placeholder="you@example.com" required>
+
+        <label for="password">Password</label>
+        <input id="password" type="password"
+               autocomplete="current-password"
+               minlength="8" placeholder="At least 8 characters" required>
+
+        <button id="auth-submit" class="primary full" type="submit">
+          Log in
+        </button>
+      </form>
+      <p id="auth-status" class="status" role="status" aria-live="polite"></p>
+      <p class="fine-print">This space is for the two of you. Never share your password.</p>
+    </section>
+
+    <section id="dashboard" hidden>
+      <div class="welcome">
+        <div>
+          <p class="eyebrow">YOUR SHARED SPACE</p>
+          <h1>Hi, you two <span class="accent">♡</span></h1>
+          <p class="muted">A little check-in can mean a lot.</p>
+        </div>
+        <button id="logout-button" class="secondary" type="button">Log out</button>
+      </div>
+
+      <p id="dashboard-status" class="status" role="status" aria-live="polite"></p>
+
+      <section class="panel mood-panel">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">HOW ARE WE FEELING?</p>
+            <h2>Our moods</h2>
+          </div>
+          <span class="live-badge"><span class="live-dot"></span> Live</span>
+        </div>
+
+        <div id="mood-cards" class="mood-cards">
+          <p class="muted">Loading your shared space…</p>
+        </div>
+
+        <div class="divider"></div>
+
+        <h3>How are you feeling today?</h3>
+        <p class="muted small">Choose a number from 1 to 10.</p>
+
+        <div id="mood-picker" class="mood-picker" aria-label="Choose your mood">
+          <button type="button" data-score="1" aria-label="Mood 1">1</button>
+          <button type="button" data-score="2" aria-label="Mood 2">2</button>
+          <button type="button" data-score="3" aria-label="Mood 3">3</button>
+          <button type="button" data-score="4" aria-label="Mood 4">4</button>
+          <button type="button" data-score="5" aria-label="Mood 5">5</button>
+          <button type="button" data-score="6" aria-label="Mood 6">6</button>
+          <button type="button" data-score="7" aria-label="Mood 7">7</button>
+          <button type="button" data-score="8" aria-label="Mood 8">8</button>
+          <button type="button" data-score="9" aria-label="Mood 9">9</button>
+          <button type="button" data-score="10" aria-label="Mood 10">10</button>
+        </div>
+
+        <p id="selected-mood" class="selected-mood">Choose whichever number feels right ♡</p>
+
+        <label for="mood-note">A little note (optional)</label>
+        <textarea id="mood-note" maxlength="280" rows="2"
+          placeholder="What's on your mind?"></textarea>
+
+        <button id="save-mood" class="primary full" type="button" disabled>
+          Save my mood ♡
+        </button>
+        <p id="mood-status" class="status" role="status" aria-live="polite"></p>
+      </section>
+
+      <section class="panel history-panel">
+        <p class="eyebrow">LITTLE MOMENTS, OVER TIME</p>
+        <h2>Recent mood history</h2>
+        <p class="muted small">Your latest shared mood updates, newest first.</p>
+        <div id="mood-history">
+          <p class="muted">Loading history…</p>
+        </div>
+      </section>
+
+      <footer>
+        Made with care, for two. <span class="accent">♡</span>
+      </footer>
+    </section>
+  </main>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
