@@ -4,8 +4,523 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#fff5f8">
-  <title>Fuzzy World ♡</title>
-  <link rel="stylesheet" href="./style.css">
+  <title>Fuzzy World ♡ — Our Little Universe</title>
+  <meta name="description" content="A private, beautifully designed space for two hearts — moods, questions, games, two moons and a shared constellation.">
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #faf8f6;
+  --surface: #ffffff;
+  --text: #302b2d;
+  --muted: #898184;
+  --accent: #a65e7b;
+  --accent-light: #f5e8ee;
+  --border: #eee7e8;
+  --success: #43846a;
+  --radius: 20px;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; line-height: 1.55;
+}
+button, input, textarea { font: inherit; }
+button { cursor: pointer; }
+button:focus-visible, input:focus-visible, textarea:focus-visible {
+  outline: 3px solid #d7a4b9; outline-offset: 2px;
+}
+.page { width: min(760px, 100%); margin: 0 auto; padding: 22px 20px 40px; }
+.topbar, .brand, .live-label, .section-heading, .welcome, .live-badge {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.topbar { margin-bottom: 38px; }
+.brand { justify-content: flex-start; text-decoration: none; color: var(--text); font-weight: 650; letter-spacing: -.4px; }
+.brand-heart, .accent { color: var(--accent); }
+.brand-heart { font-size: 29px; }
+.live-label, .live-badge { color: var(--muted); font-size: 12px; }
+.live-dot { width: 7px; height: 7px; display: inline-block; border-radius: 50%; background: var(--success); }
+h1, h2, h3, p { margin-top: 0; }
+h1 { margin-bottom: 8px; font-size: clamp(30px, 7vw, 42px); line-height: 1.15; letter-spacing: -1.5px; }
+h2 { margin-bottom: 8px; font-size: 23px; letter-spacing: -.6px; }
+h3 { margin-bottom: 5px; font-size: 16px; }
+.eyebrow { margin-bottom: 8px; color: var(--accent); font-size: 10px; font-weight: 750; letter-spacing: 1.8px; }
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+.panel { padding: 26px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); box-shadow: 0 8px 30px #39212b08; }
+.auth-panel { max-width: 480px; margin: 0 auto; }
+.auth-panel h1 { margin-bottom: 12px; }
+.auth-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin: 28px 0 22px; padding: 5px; border-radius: 12px; background: var(--bg); }
+.tab { padding: 10px; border: 0; border-radius: 9px; background: transparent; color: var(--muted); }
+.tab.active { background: white; color: var(--accent); box-shadow: 0 1px 5px #0000000c; font-weight: 650; }
+label { display: block; margin: 16px 0 7px; font-size: 13px; font-weight: 600; }
+input, textarea { display: block; width: 100%; padding: 12px 13px; border: 1px solid var(--border); border-radius: 11px; background: white; color: var(--text); }
+textarea { resize: vertical; }
+.primary, .secondary { min-height: 44px; padding: 11px 17px; border: 0; border-radius: 11px; font-weight: 650; }
+.primary { background: var(--accent); color: white; }
+.primary:disabled { cursor: not-allowed; opacity: .45; }
+.secondary { border: 1px solid var(--border); background: white; color: var(--text); }
+.full { width: 100%; margin-top: 18px; }
+.status { min-height: 20px; margin: 10px 0 0; color: var(--accent); font-size: 13px; overflow-wrap: anywhere; }
+.fine-print { margin: 18px 0 0; color: var(--muted); font-size: 11px; }
+.welcome { align-items: flex-start; margin-bottom: 22px; }
+.welcome h1 { font-size: 34px; }
+.mood-panel, .history-panel, .calendar-panel { margin-bottom: 18px; }
+.section-heading { align-items: flex-start; margin-bottom: 20px; }
+.live-badge { justify-content: flex-start; padding: 6px 9px; border-radius: 20px; background: #edf6f0; color: #43846a; }
+.mood-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.mood-card { min-width: 0; padding: 16px; border: 1px solid var(--border); border-radius: 15px; background: #fdfbfc; }
+.mood-card .person { margin-bottom: 9px; font-size: 13px; font-weight: 600; overflow-wrap: anywhere; }
+.mood-score { margin-bottom: 2px; color: var(--accent); font-size: 34px; font-weight: 700; letter-spacing: -1px; }
+.mood-card .description { font-size: 13px; }
+.timestamp { margin: 10px 0 0; color: var(--muted); font-size: 11px; overflow-wrap: anywhere; }
+.note { margin: 9px 0 0; padding-top: 8px; border-top: 1px solid var(--border); font-size: 12px; overflow-wrap: anywhere; white-space: pre-wrap; }
+.divider { height: 1px; margin: 25px 0; background: var(--border); }
+.mood-picker { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 5px; margin: 16px 0 8px; }
+.mood-picker button { min-width: 0; aspect-ratio: 1; padding: 0; border: 1px solid var(--border); border-radius: 9px; background: white; color: var(--text); }
+.mood-picker button.selected { border-color: var(--accent); background: var(--accent-light); color: var(--accent); font-weight: 750; }
+.selected-mood { margin: 10px 0 18px; color: var(--accent); font-size: 13px; }
+.history-item { display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+.history-item:last-child { border-bottom: 0; }
+.history-score { display: grid; width: 44px; height: 44px; place-items: center; border-radius: 12px; background: var(--accent-light); color: var(--accent); font-weight: 750; }
+.history-main { min-width: 0; }
+.history-main p { margin-bottom: 3px; overflow-wrap: anywhere; }
+footer { padding: 18px 0; color: var(--muted); font-size: 12px; text-align: center; }
+[hidden] { display: none !important; }
+
+/* Mood calendar */
+.calendar-toolbar { display: grid; grid-template-columns: 42px 1fr 42px; align-items: center; gap: 10px; margin: 20px 0 14px; }
+.calendar-toolbar h3 { margin: 0; text-align: center; font-size: 16px; }
+.calendar-nav { width: 42px; height: 42px; border: 1px solid var(--border); border-radius: 12px; background: white; color: var(--accent); font-size: 26px; line-height: 1; }
+.calendar-weekdays, .calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+.calendar-weekdays { margin-bottom: 7px; }
+.calendar-weekdays span { color: var(--muted); font-size: 11px; font-weight: 650; text-align: center; }
+.calendar-day, .calendar-empty { min-width: 0; aspect-ratio: 1 / 1; }
+.calendar-day { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 3px 0; border: 1px solid transparent; border-radius: 12px; background: transparent; color: var(--text); }
+.calendar-day:hover { background: #fdf1f5; }
+.calendar-day-number { font-size: 13px; }
+.calendar-day.today { border-color: #d8a6ba; }
+.calendar-day.selected { background: var(--accent-light); border-color: var(--accent); color: var(--accent); font-weight: 750; }
+.calendar-day-dot { width: 5px; height: 5px; border-radius: 50%; background: #c48aa2; }
+.calendar-day.has-both .calendar-day-dot { width: 13px; border-radius: 6px; background: var(--success); }
+.calendar-legend { display: flex; align-items: center; gap: 8px; margin-top: 14px; color: var(--muted); font-size: 11px; }
+.legend-dot { width: 7px; height: 7px; border-radius: 50%; background: #c48aa2; }
+.selected-day-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.selected-day-heading .eyebrow { margin-bottom: 4px; }
+.selected-day-heading h3 { margin: 0; font-size: 15px; }
+.day-count { color: var(--muted); font-size: 11px; white-space: nowrap; }
+.day-mood-item { display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 12px; padding: 13px 0; border-bottom: 1px solid var(--border); }
+.day-mood-item:last-child { border-bottom: 0; }
+.day-mood-score { align-self: start; padding: 9px 5px; border-radius: 12px; background: var(--accent-light); color: var(--accent); font-size: 14px; font-weight: 750; text-align: center; }
+.day-mood-details { min-width: 0; }
+.day-mood-person { margin: 0 0 4px; font-size: 13px; font-weight: 650; overflow-wrap: anywhere; }
+@media (max-width: 480px) {
+  .page { padding: 18px 13px 30px; }
+  .panel { padding: 19px 15px; }
+  .topbar { margin-bottom: 25px; }
+  .live-label { font-size: 10px; }
+  .mood-picker { gap: 3px; }
+  .mood-picker button { border-radius: 6px; font-size: 12px; }
+  .mood-card { padding: 12px 10px; }
+  .mood-score { font-size: 29px; }
+  .calendar-weekdays, .calendar-grid { gap: 3px; }
+  .calendar-day { border-radius: 9px; }
+  .calendar-day-number { font-size: 12px; }
+}
+/* ===== Cute pastel calendar refresh ===== */
+.calendar-panel {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 100% 0%, #ffe6f0 0, transparent 34%),
+    radial-gradient(ellipse at 0% 100%, #e9e9ff 0, transparent 32%),
+    #fffdfd;
+  border-color: #f1dfe8;
+}
+.calendar-panel > .eyebrow::after {
+  content: " ✿";
+  color: #d58aa9;
+  font-size: 13px;
+}
+.calendar-panel h2 {
+  color: #6c4660;
+  font-size: 27px;
+}
+.calendar-toolbar {
+  padding: 9px;
+  border: 1px solid #f4e2eb;
+  border-radius: 18px;
+  background: linear-gradient(110deg, #fff0f6, #f1efff, #eef9f5);
+}
+.calendar-toolbar h3 {
+  color: #6f526d;
+  letter-spacing: -.2px;
+}
+.calendar-nav {
+  width: 38px;
+  height: 38px;
+  border: 1px solid #efd6e3;
+  border-radius: 13px;
+  background: #fff;
+  color: #b55f87;
+  box-shadow: 0 3px 8px #9f668b12;
+  transition: transform .18s ease, background .18s ease;
+}
+.calendar-nav:hover {
+  transform: translateY(-2px);
+  background: #fff4f8;
+}
+.calendar-weekdays {
+  margin: 12px 0 9px;
+}
+.calendar-weekdays span {
+  padding: 6px 0;
+  border-radius: 9px;
+  color: #9a7e91;
+  font-size: 10px;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+}
+.calendar-grid {
+  gap: 7px;
+}
+.calendar-day {
+  position: relative;
+  min-height: 39px;
+  border: 1px solid transparent;
+  border-radius: 13px;
+  background: #fff;
+  box-shadow: 0 2px 8px #67445a0a;
+  transition: transform .16s ease, box-shadow .16s ease, background .16s ease;
+}
+.calendar-day:hover {
+  transform: translateY(-2px);
+  background: #fff0f6;
+  box-shadow: 0 5px 12px #c47a9c1c;
+}
+.calendar-day-number {
+  font-size: 13px;
+  font-weight: 550;
+}
+.calendar-day.today {
+  border: 1px solid #d5a2ee;
+  background: #f6efff;
+  color: #8b59a4;
+}
+.calendar-day.selected {
+  border: 1px solid #d982a8;
+  background: linear-gradient(145deg, #f9dce9, #f0e5ff);
+  color: #814564;
+  box-shadow: 0 4px 12px #d38caf2b;
+}
+.calendar-day.has-moods:not(.selected):not(.today) {
+  background: #fff1f6;
+  border-color: #f7d9e6;
+}
+.calendar-day.has-both:not(.selected):not(.today) {
+  background: #eaf8f0;
+  border-color: #d2efdf;
+}
+.calendar-day-dot {
+  width: 6px;
+  height: 6px;
+  background: #dc82a8;
+  box-shadow: 0 0 0 2px #fce5ef;
+}
+.calendar-day.has-both .calendar-day-dot {
+  width: 14px;
+  height: 6px;
+  background: #68b58c;
+  box-shadow: 0 0 0 2px #dff4e8;
+}
+.calendar-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 17px 0 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #fff6fa;
+  color: #9b7b8e;
+}
+.legend-dot {
+  background: #dc82a8;
+  box-shadow: 0 0 0 3px #fce5ef;
+}
+.selected-day-heading {
+  margin-bottom: 10px;
+}
+.selected-day-heading h3 {
+  color: #6c4660;
+}
+.day-count {
+  padding: 5px 9px;
+  border-radius: 20px;
+  background: #f3eaff;
+  color: #8d68a5;
+}
+#selected-day-moods {
+  padding: 0 12px;
+  border: 1px solid #f2e4ec;
+  border-radius: 15px;
+  background: #fffafb;
+}
+.day-mood-item {
+  border-bottom-color: #f2e7ed;
+}
+.day-mood-score {
+  border: 1px solid #f4d9e6;
+  background: linear-gradient(145deg, #ffedf4, #f1eaff);
+  color: #a45d82;
+}
+.day-mood-person {
+  color: #67495d;
+}
+.calendar-panel .divider {
+  background: linear-gradient(90deg, #f7dce8, #e8e1fb, #dff1e6);
+}
+@media (max-width: 480px) {
+  .calendar-toolbar { padding: 7px; border-radius: 15px; }
+  .calendar-grid { gap: 4px; }
+  .calendar-day { min-height: 35px; border-radius: 10px; }
+  .calendar-weekdays span { font-size: 9px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .calendar-day, .calendar-nav { transition: none; }
+}
+
+/* Fuzzy World redesign: shared shell, sidebar, home dashboard and calendar */
+:root { --bg:#fff8fa; --surface:#fff; --text:#3f3039; --muted:#927f8a; --accent:#c05f88; --accent-light:#fdeaf2; --border:#f3dce6; --radius:22px; }
+body { background:radial-gradient(circle at 15% 0%,#fff0f6 0,transparent 32%),var(--bg); }
+[hidden] { display:none !important; }
+.auth-page { max-width:460px; margin:7vh auto 30px; }
+.auth-brand { margin-bottom:28px; }
+.auth-panel h1 { font-size:clamp(32px,7vw,44px); }
+.auth-panel label, .mood-panel label { display:block; margin:14px 0 6px; font-size:13px; font-weight:650; }
+.auth-panel input, .mood-panel textarea { width:100%; padding:12px 13px; border:1px solid var(--border); border-radius:13px; background:#fffafd; color:var(--text); }
+.auth-tabs { display:flex; gap:8px; margin:24px 0 18px; padding:5px; border-radius:14px; background:#fff0f6; }
+.tab { flex:1; border:0; border-radius:10px; padding:10px; background:transparent; color:var(--muted); }
+.tab.active { background:#fff; color:var(--accent); box-shadow:0 3px 12px #9b4c6d10; }
+.primary { border:0; border-radius:13px; padding:12px 16px; color:white; background:linear-gradient(135deg,#ce7397,#b95c86); font-weight:700; box-shadow:0 7px 18px #c05f8824; }
+.primary:disabled { opacity:.55; cursor:not-allowed; }
+.full { width:100%; margin-top:14px; }
+.status { min-height:1.2em; font-size:13px; color:var(--accent); }
+.fine-print { margin-top:20px; font-size:12px; color:var(--muted); }
+.app-shell { min-height:100vh; }
+.sidebar { position:fixed; z-index:30; inset:0 auto 0 0; width:254px; display:flex; flex-direction:column; padding:25px 15px 18px; background:#fffdfd; border-right:1px solid var(--border); transition:width .2s ease,transform .2s ease; }
+.sidebar-brand { display:flex; align-items:center; gap:9px; padding:0 8px 24px; font-weight:750; letter-spacing:-.4px; white-space:nowrap; }
+.sidebar-brand-text { flex:1; }
+.sidebar-caption { padding:0 12px; margin:0 0 10px; font-size:9px; letter-spacing:1.5px; color:#b19ba7; font-weight:800; white-space:nowrap; }
+.main-nav { display:grid; gap:5px; }
+.nav-item { display:flex; align-items:center; gap:12px; width:100%; min-height:43px; padding:10px 12px; border:0; border-radius:13px; text-align:left; color:#806c78; background:transparent; font-size:13px; white-space:nowrap; }
+.nav-item:hover { background:#fff2f7; color:var(--accent); }
+.nav-item.active { color:#b84f7d; background:#fdeaf2; font-weight:750; }
+.nav-icon { display:inline-flex; width:20px; justify-content:center; font-size:19px; line-height:1; }
+.nav-label { overflow:hidden; text-overflow:ellipsis; }
+.nav-soon { margin-left:auto; font-size:8px; letter-spacing:.7px; color:#b85e85; background:#fff; padding:3px 5px; border-radius:5px; }
+.sidebar-bottom { margin-top:auto; }
+.sidebar-love-note { padding:15px 10px; border-top:1px solid #f7e6ed; font-size:11px; color:#a58b99; }
+.sidebar-love-note span { color:#d47fa1; }
+.logout-item { margin-top:3px; }
+.desktop-collapse { margin-left:auto; }
+.icon-button { display:inline-flex; align-items:center; justify-content:center; min-width:35px; min-height:35px; border:1px solid var(--border); border-radius:11px; background:#fff; color:var(--accent); font-size:20px; }
+.main-content { margin-left:254px; max-width:1180px; padding:35px clamp(20px,4vw,54px) 24px; }
+.mobile-topbar { display:none; }
+.welcome { margin-bottom:24px; }
+.welcome h1,.page-heading h1 { font-size:clamp(30px,4vw,42px); letter-spacing:-1.2px; }
+.today-pill { padding:8px 12px; border:1px solid var(--border); background:#fff; border-radius:99px; font-size:12px; color:#a2788e; white-space:nowrap; }
+.relationship-panel { display:flex; align-items:center; gap:17px; margin-bottom:20px; padding:20px 24px; background:linear-gradient(115deg,#fff0f6,#fff 72%); }
+.relationship-heart { display:grid; place-items:center; flex:0 0 56px; width:56px; height:56px; border-radius:19px; background:#ffe0ed; color:#c65e8b; font-size:33px; }
+.relationship-panel h2 { margin:0 0 3px; font-size:clamp(22px,3vw,29px); }
+.relationship-panel .eyebrow { margin-bottom:4px; }
+.relationship-panel p { margin-bottom:0; }
+.relationship-sparkle { margin-left:auto; color:#d98eac; font-size:32px; }
+.mood-panel,.calendar-panel { margin-bottom:20px; }
+.mood-cards { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+.mood-card { min-width:0; padding:16px; border:1px solid #f5e3eb; border-radius:16px; background:#fffafd; }
+.person { margin-bottom:5px; color:#9c6f85; font-size:12px; font-weight:750; }
+.mood-score { font-size:32px; line-height:1.15; font-weight:750; color:#bf5e88; letter-spacing:-1px; }
+.description { margin:5px 0; font-size:13px; font-weight:650; }
+.timestamp { margin:3px 0 0; color:var(--muted); font-size:11px; }
+.note { margin:10px 0 0; padding:8px 10px; border-radius:10px; background:#fff0f6; color:#795b6a; font-size:12px; overflow-wrap:anywhere; }
+.divider { height:1px; margin:22px 0; background:var(--border); }
+.mood-picker { display:grid; grid-template-columns:repeat(10,minmax(0,1fr)); gap:6px; }
+.mood-picker button { aspect-ratio:1; min-width:0; padding:0; border:1px solid var(--border); border-radius:11px; background:#fffafd; color:#9b7185; font-size:13px; }
+.mood-picker button:hover,.mood-picker button.selected { background:#c05f88; color:#fff; border-color:#c05f88; }
+.selected-mood { margin:12px 0; color:#b55a82; font-size:13px; }
+.calendar-controls { display:flex; align-items:center; justify-content:space-between; gap:10px; margin:18px 0 14px; }
+.calendar-controls h3 { margin:0; font-size:17px; }
+.calendar-grid { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:6px; text-align:center; }
+.calendar-weekdays { color:#ad91a0; font-size:10px; font-weight:750; padding-bottom:7px; }
+.calendar-days button { position:relative; min-width:0; aspect-ratio:1; border:1px solid transparent; border-radius:13px; background:transparent; color:#6f5866; font-size:12px; }
+.calendar-days button:hover { background:#fff0f6; }
+.calendar-days button.today { border-color:#d88eac; }
+.calendar-days button.has-event:after { content:""; position:absolute; bottom:5px; left:calc(50% - 3px); width:6px; height:6px; border-radius:50%; background:#d76f9b; }
+.calendar-days button.selected { background:#c05f88; color:#fff; }
+.calendar-days button.selected:after { background:#fff; }
+.calendar-days button.outside { color:#d1c0c9; }
+.calendar-legend { display:flex; flex-wrap:wrap; gap:8px 14px; margin:18px 0 12px; color:#8e7784; font-size:11px; }
+.calendar-legend span { display:inline-flex; align-items:center; gap:6px; }
+.legend-dot { width:7px; height:7px; border-radius:50%; background:#d76f9b; }
+.selected-date-events { padding:12px 14px; border-radius:13px; background:#fff4f8; font-size:12px; }
+.selected-date-events p { margin:0; }
+.event-line { display:flex; gap:9px; align-items:flex-start; padding:4px 0; }
+.event-emoji { font-size:17px; }
+.page-heading { margin-bottom:24px; }
+.page-heading .muted { margin-bottom:0; }
+.app-page > .panel { margin-bottom:20px; }
+.feature-panel { text-align:center; padding:38px 24px; }
+.feature-emoji { display:grid; place-items:center; width:60px; height:60px; margin:0 auto 16px; border-radius:20px; background:#fff0f6; color:#c05f88; font-size:29px; }
+.feature-panel h2 { margin-bottom:8px; }
+.feature-panel p { max-width:520px; margin:0 auto 12px; color:#8f7b86; font-size:13px; }
+.feature-status { display:inline-block; margin:10px 0 16px; padding:7px 11px; border-radius:99px; background:#fff0f6; color:#b55a82; font-size:11px; }
+.setting-row { display:flex; justify-content:space-between; gap:14px; padding:14px 0; border-bottom:1px solid var(--border); }
+.setting-row:last-of-type { border-bottom:0; }
+.setting-row p { margin:3px 0 0; }
+.global-status { margin:0 0 8px; }
+.app-footer { padding:22px 0 10px; text-align:center; font-size:11px; color:#a78d9a; }
+.sidebar.collapsed { width:78px; }
+.sidebar.collapsed .sidebar-brand-text,.sidebar.collapsed .sidebar-caption,.sidebar.collapsed .nav-label,.sidebar.collapsed .nav-soon,.sidebar.collapsed .sidebar-love-note { display:none; }
+.sidebar.collapsed .sidebar-brand { justify-content:center; padding-left:0; padding-right:0; flex-wrap:wrap; }
+.sidebar.collapsed .desktop-collapse { margin:0; }
+.sidebar.collapsed .nav-item { justify-content:center; padding:10px 0; }
+.sidebar.collapsed .nav-icon { width:auto; font-size:21px; }
+.main-content.sidebar-is-collapsed { margin-left:78px; }
+.mobile-backdrop { display:none; }
+@media (max-width:800px) {
+  .sidebar { width:270px; transform:translateX(-105%); box-shadow:15px 0 40px #5b294018; }
+  .sidebar.mobile-open { transform:translateX(0); }
+  .sidebar.collapsed { width:270px; }
+  .sidebar.collapsed .sidebar-brand-text,.sidebar.collapsed .sidebar-caption,.sidebar.collapsed .nav-label,.sidebar.collapsed .nav-soon,.sidebar.collapsed .sidebar-love-note { display:initial; }
+  .sidebar.collapsed .sidebar-brand { justify-content:flex-start; }
+  .sidebar.collapsed .desktop-collapse { display:none; }
+  .sidebar.collapsed .nav-item { justify-content:flex-start; padding:10px 12px; }
+  .sidebar.collapsed .nav-icon { width:20px; }
+  .main-content,.main-content.sidebar-is-collapsed { margin-left:0; padding:0 16px 20px; }
+  .mobile-topbar { display:flex; position:sticky; top:0; z-index:15; align-items:center; gap:12px; margin:0 -16px 24px; padding:12px 16px; background:#fffdfdf2; backdrop-filter:blur(12px); border-bottom:1px solid var(--border); }
+  .mobile-topbar .brand { margin-right:auto; }
+  .mobile-topbar .brand-heart { font-size:24px; }
+  .tiny-heart { color:#c05f88; }
+  .mobile-backdrop.visible { display:block; position:fixed; z-index:25; inset:0; background:#42223445; }
+  .welcome { align-items:flex-start; }
+  .today-pill { display:none; }
+  .panel { padding:20px; }
+  .relationship-panel { padding:17px; }
+}
+@media (max-width:420px) {
+  .mood-cards { grid-template-columns:1fr; }
+  .mood-picker { gap:4px; }
+  .mood-picker button { border-radius:8px; font-size:11px; }
+  .calendar-grid { gap:3px; }
+  .calendar-days button { border-radius:9px; }
+  .relationship-heart { flex-basis:45px; width:45px; height:45px; font-size:27px; }
+  .relationship-panel { gap:12px; }
+  .relationship-sparkle { display:none; }
+}
+
+/* Stage 2: dedicated mood calendar and searchable history */
+.mood-calendar-panel { overflow: hidden; }
+.mood-calendar-help { margin: 12px 0 16px; }
+.mood-calendar-day { position: relative; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0; min-height:42px; }
+.mood-calendar-day.has-mood { background: #fff0f6; border-color: #efb9d0; color: #874564; font-weight:700; }
+.mood-calendar-day .mood-day-dot { display:block; height:7px; line-height:7px; font-size:16px; color:#c75f91; margin-top:-1px; }
+.mood-calendar-day.selected { outline:2px solid var(--accent, #c86d96); outline-offset:1px; }
+.mood-day-detail { margin-top:12px; padding:16px; border:1px solid var(--border); border-radius:16px; background:rgba(255,255,255,.55); }
+.mood-detail-date { font-size:1rem; margin:0 0 10px; }
+.mood-detail-item { display:flex; align-items:flex-start; gap:12px; padding:12px 0; border-top:1px solid var(--border); }
+.mood-detail-item:first-of-type { border-top:0; }
+.mood-detail-score { flex:0 0 42px; }
+.mood-detail-content { min-width:0; }
+.mood-detail-content p { margin-top:0; }
+.mood-history-filters { display:grid; grid-template-columns:auto minmax(130px, 180px) auto minmax(160px, 1fr); align-items:center; gap:8px 12px; margin:16px 0 8px; }
+.mood-history-filters label { font-size:.85rem; color:var(--muted); }
+.mood-history-filters select,.mood-history-filters input { width:100%; min-width:0; border:1px solid var(--border); border-radius:12px; padding:10px 12px; background:var(--panel, #fff); color:inherit; font:inherit; }
+.history-heading { align-items:center; }
+.history-heading h2 { margin-bottom:4px; }
+.history-heading .muted { margin-bottom:0; }
+.history-person { font-weight:650; }
+@media (max-width:620px) {
+  .mood-history-filters { grid-template-columns:1fr; gap:6px; }
+  .mood-history-filters label:not(:first-child) { margin-top:8px; }
+  .mood-calendar-day { min-height:36px; }
+  .mood-day-detail { padding:12px; }
+}
+
+/* Stage 3: Question Corner */
+.question-intro { display:flex; align-items:center; justify-content:space-between; gap:18px; margin-bottom:20px; background:linear-gradient(115deg,#fff0f6,#fff 75%); }
+.question-intro h2 { margin:0 0 6px; font-size:clamp(22px,3vw,28px); }
+.question-intro p { margin-bottom:0; }
+.question-heart { display:grid; place-items:center; flex:0 0 52px; width:52px; height:52px; border-radius:18px; background:#ffe1ed; color:#c05f88; font-size:31px; }
+.question-heart.small-heart { flex-basis:42px; width:42px; height:42px; font-size:23px; }
+.question-panel,.question-history-panel { margin-bottom:20px; }
+.question-progress { display:inline-flex; align-items:center; border-radius:99px; background:#fff0f6; color:#a6537a; padding:7px 10px; font-size:11px; white-space:nowrap; }
+.questions-list { display:grid; gap:12px; margin:16px 0 20px; }
+.question-card { border:1px solid var(--border); background:#fffafd; border-radius:16px; padding:16px; }
+.question-card h3 { margin:0 0 12px; font-size:14px; line-height:1.5; }
+.question-card .question-number { color:#bd628a; font-size:11px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; margin:0 0 7px; }
+.question-options { display:grid; gap:8px; }
+.question-option { display:flex; align-items:flex-start; gap:10px; border:1px solid #f1dbe5; border-radius:12px; padding:10px 12px; background:#fff; cursor:pointer; color:#755d6a; font-size:13px; line-height:1.45; }
+.question-option:has(input:checked) { background:#fff0f6; border-color:#d889aa; color:#934769; }
+.question-option input { margin-top:2px; accent-color:#c05f88; }
+.question-option input:disabled { opacity:.7; }
+.question-card .question-locked { font-size:12px; color:#987f8c; margin:10px 0 0; }
+.shared-prompt { padding:14px 16px; margin:14px 0; border-radius:14px; background:#fff2f7; color:#80556a; font-weight:650; line-height:1.55; }
+.question-panel textarea { width:100%; resize:vertical; border:1px solid var(--border); border-radius:13px; padding:12px 14px; background:#fff; color:inherit; font:inherit; margin:8px 0 12px; }
+.answer-reveal { display:grid; gap:10px; margin-top:16px; }
+.answer-bubble { padding:13px 14px; border-radius:14px; border:1px solid var(--border); background:#fffafd; }
+.answer-bubble strong { display:block; color:#a6537a; font-size:12px; margin-bottom:6px; }
+.answer-bubble p { margin:0; white-space:pre-wrap; overflow-wrap:anywhere; font-size:13px; line-height:1.55; }
+.answer-waiting { margin:14px 0 0; padding:12px; border-radius:12px; background:#faf5f8; color:#927e89; font-size:12px; }
+.question-history-list { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+.question-history-day { border:1px solid var(--border); border-radius:12px; padding:9px 12px; background:#fff; color:#8d6076; font:inherit; font-size:12px; cursor:pointer; }
+.question-history-day.active,.question-history-day:hover { background:#c05f88; border-color:#c05f88; color:#fff; }
+@media(max-width:620px) { .question-intro { align-items:flex-start; padding:18px; } .question-heart { flex-basis:42px; width:42px; height:42px; font-size:25px; } .question-card { padding:13px; } .question-panel .section-heading { align-items:flex-start; } }
+
+/* Stage 4 Part A — Ask Your Person */
+.ask-question-card { padding: 19px 0; border-bottom: 1px solid var(--border); }
+.ask-question-card:last-child { border-bottom: 0; }
+.ask-question-meta { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px 12px; margin-bottom: 10px; }
+.ask-question-author { color: var(--accent); font-size: 12px; font-weight: 750; }
+.ask-question-text { margin: 0 0 14px; font-size: 17px; font-weight: 650; white-space: pre-wrap; overflow-wrap: anywhere; }
+.ask-answer-box { margin: 12px 0; padding: 15px; border: 1px solid var(--border); border-radius: 13px; background: #fdf7fa; }
+.ask-answer-box .eyebrow { margin-bottom: 7px; }
+.ask-answer-text { margin-bottom: 7px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.ask-answer-box .timestamp { margin-bottom: 0; }
+.ask-inline-form { margin-top: 14px; }
+.ask-inline-form label { margin-top: 8px; }
+.ask-inline-form button { margin-top: 10px; }
+.ask-edit-input, .ask-answer-input { min-height: 75px; }
+.ask-locked-label { display: inline-block; margin-top: 8px; color: var(--muted); font-size: 12px; }
+
+
+/* Stage 4 Part B — Notes & Letters */
+#page-letters input, #page-letters textarea { width:100%; box-sizing:border-box; border:1px solid var(--border); border-radius:13px; padding:12px 14px; background:#fff; color:inherit; font:inherit; margin:7px 0 14px; }
+#page-letters textarea { resize:vertical; line-height:1.6; }
+.letter-actions,.letter-card-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:8px; }
+.letter-card { padding:18px 0; border-bottom:1px solid var(--border); }
+.letter-card:last-child { border-bottom:0; }
+.letter-card-title { color:var(--accent); font-size:17px; margin:7px 0 9px; }
+.letter-card-body { white-space:pre-wrap; overflow-wrap:anywhere; line-height:1.7; margin:0 0 12px; }
+@media(max-width:620px) { .letter-actions button,.letter-card-actions button { flex:1; } }
+
+
+/* Stage 5 · Games Corner */
+.games-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:18px 0}.game-tile{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:8px;border:1px solid var(--border,#f0dce5);border-radius:18px;padding:16px;background:var(--panel,#fff);color:inherit;cursor:pointer;min-height:145px;transition:transform .15s,border-color .15s}.game-tile:hover{transform:translateY(-2px)}.game-tile.selected{border-color:#d98ab4;box-shadow:0 0 0 2px #fbe6f1}.game-tile-emoji{font-size:25px}.game-tile strong{font-size:14px}.game-tile small{font-size:12px;color:var(--muted,#8c7a87);line-height:1.4}.game-panel{margin-top:14px}.game-title{display:flex;align-items:center;justify-content:space-between;gap:12px}.game-title h2{margin:0}.game-pill{border-radius:999px;background:#fff0f6;color:#9d527c;padding:7px 11px;font-size:12px;white-space:nowrap}.ttt-board{display:grid;grid-template-columns:repeat(3,minmax(0,88px));gap:9px;justify-content:center;margin:22px auto}.ttt-cell{height:82px;border:1px solid #ead7e3;border-radius:16px;background:#fff8fb;font-size:34px;color:#a45e8c;cursor:pointer}.ttt-cell:disabled{cursor:default;opacity:.9}.game-actions{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px}.memory-board{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;max-width:430px;margin:18px auto}.memory-card{aspect-ratio:1;border:1px solid #ecd6e3;border-radius:14px;background:#fff3f8;font-size:27px;cursor:pointer}.memory-card.matched{background:#f0eaff;border-color:#c8b8e8;cursor:default}.wyr-options{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0}.wyr-choice{border:1px solid #ead7e3;border-radius:16px;background:#fff8fb;padding:18px 14px;min-height:92px;color:inherit;cursor:pointer;font-weight:600}.wyr-choice.chosen{border-color:#cc7fa7;background:#ffeaf4}.wyr-choice:disabled{cursor:default}.game-form{display:grid;gap:8px;margin-top:14px}.game-form input,.game-form select{width:100%;margin-bottom:7px}.guess-live{margin-top:18px;border-radius:16px;padding:16px;background:#fff7fb}.guess-live:empty{display:none}.guess-option{display:block;width:100%;text-align:left;margin:8px 0;padding:12px;border:1px solid #ead7e3;border-radius:12px;background:white;color:inherit;cursor:pointer}.games-footnote{margin-top:16px}.status{white-space:pre-line}
+@media(max-width:900px){.games-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:520px){.games-grid{gap:8px}.game-tile{padding:12px;min-height:132px}.ttt-board{grid-template-columns:repeat(3,minmax(0,76px))}.ttt-cell{height:72px}.wyr-options{grid-template-columns:1fr}.game-title{align-items:flex-start}}
+
+/* Stage 5 improvements: persistent answer history and disabled next-question state */
+.game-history{margin-top:1.25rem;display:grid;gap:.65rem}.game-history-item{padding:.8rem 1rem;border:1px solid var(--border, #ead9e8);border-radius:14px;background:rgba(255,255,255,.45)}.game-history-item p{margin:.35rem 0 0}.game-actions button:disabled{opacity:.48;cursor:not-allowed}
+
+/* Fuzzy World premium features */
+
+:root{--fw-ink:#332b48;--fw-muted:#81788f;--fw-line:rgba(120,91,153,.16);--fw-glass:rgba(255,255,255,.76);--fw-lilac:#bba3f3;--fw-rose:#f2a9c8;--fw-deep:#7253a6}
+body{background:radial-gradient(ellipse at 12% 4%,rgba(249,202,224,.58),transparent 32%),radial-gradient(ellipse at 87% 12%,rgba(201,188,255,.48),transparent 32%),linear-gradient(135deg,#fff8fc,#f7f3ff 54%,#fff8fb);color:var(--fw-ink)}
+.panel,.auth-panel{backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.86);box-shadow:0 18px 55px rgba(94,65,126,.09)}
+.sidebar{background:linear-gradient(180deg,rgba(255,250,253,.96),rgba(246,241,255,.96));border-right:1px solid var(--fw-line)}
+.nav-item{transition:transform .2s ease,background .2s ease,box-shadow .2s ease}.nav-item:hover{transform:translateX(3px)}
+.fw-hero{position:relative;overflow:hidden;border-radius:28px;padding:clamp(24px,4vw,44px);background:linear-gradient(120deg,rgba(255,255,255,.91),rgba(251,232,244,.82) 48%,rgba(232,225,255,.88));border:1px solid white;box-shadow:0 24px 65px rgba(100,72,136,.13)}
+.fw-hero:after{content:'✦';position:absolute;right:7%;top:10%;font-size:clamp(90px,14vw,180px);line-height:1;color:rgba(167,137,225,.14);pointer-events:none}.fw-kicker{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#9875b9;font-weight:800}.fw-hero h2{font-size:clamp(29px,4vw,46px);line-height:1.08;letter-spacing:-.04em;margin:10px 0 12px;max-width:650px}.fw-hero p{max-width:620px;color:#766a87;line-height:1.75}.fw-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:20px}.fw-card{position:relative;overflow:hidden;border-radius:24px;padding:22px;background:var(--fw-glass);border:1px solid rgba(255,255,255,.94);box-shadow:0 15px 40px rgba(91,67,124,.08)}.fw-card h3{margin:4px 0 8px;font-size:19px}.fw-card p{color:var(--fw-muted);line-height:1.65}.fw-label{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#9b80c3;font-weight:800}.fw-button{border:0;border-radius:14px;padding:11px 15px;background:linear-gradient(120deg,#9b7bda,#d99bbd);color:white;font-weight:700;cursor:pointer;box-shadow:0 8px 20px rgba(148,112,190,.18)}.fw-button:disabled{opacity:.5;cursor:not-allowed}.fw-button.ghost{background:#f3ecfb;color:#755a9e;box-shadow:none}.fw-moons{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;margin:24px 0 18px}.fw-moon-wrap{text-align:center;min-width:0}.fw-moon{width:clamp(90px,13vw,150px);aspect-ratio:1;margin:0 auto 12px;border-radius:50%;position:relative;display:grid;place-items:center;font-size:38px;background:radial-gradient(circle at 34% 28%,#fff 0 3%,#fce5f4 15%,#d8c5ff 46%,#a89bdc 72%,#7467a9 100%);box-shadow:inset -15px -18px 30px rgba(66,46,102,.18),0 0 0 9px rgba(215,198,246,.13),0 0 45px rgba(188,155,238,.34)}.fw-moon.partner{background:radial-gradient(circle at 34% 28%,#fff 0 3%,#fff0e9 16%,#f3bdd5 43%,#bda8e8 74%,#8a75b9 100%)}.fw-moon:after{content:'';position:absolute;inset:10%;border-radius:50%;border:1px solid rgba(255,255,255,.35)}.fw-connection{color:#bd8fc9;font-size:24px;text-shadow:0 0 18px #e7b7e2}.fw-mood-name{font-weight:800;margin:0}.fw-small{font-size:12px;color:var(--fw-muted);margin-top:5px}.fw-orbit{height:330px;position:relative;overflow:hidden;border-radius:24px;background:radial-gradient(ellipse at center,rgba(99,78,150,.18),rgba(32,28,60,.96) 70%),linear-gradient(140deg,#27223f,#55416d);border:1px solid rgba(255,255,255,.65);box-shadow:inset 0 0 55px rgba(10,8,30,.5);margin:18px 0}.fw-orbit:before,.fw-orbit:after{content:'';position:absolute;border:1px solid rgba(225,208,255,.22);border-radius:50%;width:240px;height:240px;left:50%;top:50%;transform:translate(-50%,-50%)}.fw-orbit:after{width:320px;height:320px}.fw-star{position:absolute;transform:translate(-50%,-50%);border:0;background:transparent;color:#fff5c9;text-shadow:0 0 7px #fff,0 0 19px #d5a8ff;cursor:pointer;animation:fw-twinkle 3s ease-in-out infinite alternate;font-size:22px;padding:5px}.fw-star:nth-child(odd){animation-delay:1s}.fw-star:focus-visible{outline:2px solid white;border-radius:50%}@keyframes fw-twinkle{from{opacity:.55;filter:brightness(.85)}to{opacity:1;filter:brightness(1.45)}}.fw-star-info{padding:14px 16px;border-radius:16px;background:#f8f3ff;color:#66517e;margin-top:12px}.fw-recommendation{display:flex;gap:13px;align-items:flex-start;padding:15px 0;border-top:1px solid var(--fw-line)}.fw-recommendation:first-of-type{border-top:0}.fw-rec-icon{flex:0 0 42px;height:42px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(140deg,#fae4f1,#e8e1ff);font-size:20px}.fw-meter{height:7px;border-radius:99px;background:#eee7f6;overflow:hidden;margin-top:9px}.fw-meter span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#a88be6,#eea8c8)}.fw-footnote{font-size:11px;color:#9b91a8;line-height:1.6}.fw-chip{display:inline-flex;align-items:center;gap:6px;border-radius:99px;background:#f3ebfb;color:#8365a6;padding:7px 10px;font-size:11px;font-weight:700;margin:4px 4px 0 0}
+@media(max-width:760px){.fw-grid{grid-template-columns:1fr}.fw-moons{gap:5px}.fw-moon{width:84px;font-size:28px}.fw-orbit{height:280px}.fw-card{padding:18px}}
+</style>
 </head>
 <body>
   <section id="auth-panel" class="auth-panel panel page auth-page">
@@ -34,8 +549,9 @@
         <button class="nav-item" data-page="ask" type="button"><span class="nav-icon">♡</span><span class="nav-label">Ask Your Person</span></button>
         <button class="nav-item" data-page="letters" type="button"><span class="nav-icon">✉</span><span class="nav-label">Notes & Letters</span></button>
         <button class="nav-item" data-page="games" type="button"><span class="nav-icon">✿</span><span class="nav-label">Games & Activities</span></button>
-        <button class="nav-item" data-page="chat" type="button"><span class="nav-icon">☏</span><span class="nav-label">Our Chat</span></button>
-        <button class="nav-item" data-page="memories" type="button"><span class="nav-icon">▧</span><span class="nav-label">Our Memories</span></button>
+        <button class="nav-item" data-page="moons" type="button"><span class="nav-icon">☾</span><span class="nav-label">Two Moons</span></button>
+        <button class="nav-item" data-page="constellation" type="button"><span class="nav-icon">✧</span><span class="nav-label">Our Constellation</span></button>
+        <button class="nav-item" data-page="algorithm" type="button"><span class="nav-icon">✦</span><span class="nav-label">The Us Algorithm</span></button>
         <button class="nav-item" data-page="notifications" type="button"><span class="nav-icon">♧</span><span class="nav-label">Notifications</span></button>
         <button class="nav-item" data-page="settings" type="button"><span class="nav-icon">⚙</span><span class="nav-label">Settings</span></button>
       </nav>
@@ -102,13 +618,985 @@
  <section class="panel game-panel" id="game-guess" hidden><div class="game-title"><div><p class="eyebrow">HOW WELL DO YOU KNOW ME?</p><h2>Guess My Choice ✨</h2></div><span class="game-pill">Make a guess</span></div><p class="muted small">One person writes a question and secretly picks the answer. The other person guesses.</p><form id="guess-create" class="game-form"><label for="guess-question">Your question</label><input id="guess-question" maxlength="180" placeholder="Which place would I choose for a date?" required><label for="guess-a">Option A</label><input id="guess-a" maxlength="100" placeholder="Beach at sunset" required><label for="guess-b">Option B</label><input id="guess-b" maxlength="100" placeholder="Cozy movie night" required><label for="guess-correct">My secret answer</label><select id="guess-correct"><option value="0">Option A</option><option value="1">Option B</option></select><button class="primary" type="submit">Share my question ♡</button></form><div id="guess-live" class="guess-live"></div><p class="status" id="guess-status" role="status"></p><div id="guess-history" class="game-history"></div><div class="game-actions"><button class="secondary" id="guess-clear" type="button">Clear round</button></div></section>
  <p class="muted small games-footnote">Games sync between your signed-in couple accounts after the Games SQL setup is completed. Both people should open the Games & Activities page.</p>
 </section>
-      <section id="page-chat" class="app-page" data-title="Our Chat" hidden><div class="page-heading"><p class="eyebrow">JUST BETWEEN US</p><h1>Our Chat</h1><p class="muted">A private place to talk.</p></div><section class="panel feature-panel"><span class="feature-emoji">☏</span><h2>Private chat</h2><p>Messages, replies, reactions and unread counts will be built with couple-only access rules.</p><div class="feature-status">Planned for a later stage · Not active yet</div></section></section>
-      <section id="page-memories" class="app-page" data-title="Our Memories" hidden><div class="page-heading"><p class="eyebrow">OUR STORY SO FAR</p><h1>Our Memories</h1><p class="muted">Moments worth keeping.</p></div><section class="panel feature-panel"><span class="feature-emoji">▧</span><h2>A timeline of us</h2><p>Photos, captions, milestones and little “on this day” memories.</p><div class="feature-status">Planned for a later stage</div></section></section>
+      <section id="page-moons" class="app-page" data-title="Two Moons" hidden>
+        <div class="fw-hero"><div class="fw-kicker">Two hearts · Two little worlds</div><h2>Two Moons <span style="color:#c59bdc">☾</span></h2><p>A quiet little window into how you both feel today. Your moons glow from your latest shared mood check-ins — no messages, no pressure, just presence.</p><span class="fw-chip">✦ Private to your couple</span><span class="fw-chip">☾ Mood-powered</span></div>
+        <div class="fw-card" style="margin-top:18px"><div class="fw-label">YOUR SHARED SKY</div><div class="fw-moons"><div class="fw-moon-wrap"><div class="fw-moon" id="fw-moon-you">☾</div><p class="fw-mood-name" id="fw-you-mood">Waiting for your check-in</p><p class="fw-small" id="fw-you-time">Your moon is resting</p></div><div class="fw-connection">✧</div><div class="fw-moon-wrap"><div class="fw-moon partner" id="fw-moon-partner">☾</div><p class="fw-mood-name" id="fw-partner-mood">Waiting for their check-in</p><p class="fw-small" id="fw-partner-time">Their moon is resting</p></div></div><div class="fw-star-info" id="fw-moon-note">When either of you shares a mood in Mood World, your moon will update here.</div><p class="fw-footnote">Only mood information already shared through Mood World is shown. Notes are never copied into this display.</p><button class="fw-button" type="button" data-page-jump="moods">Go to Mood World ♡</button></div>
+      </section>
+      <section id="page-constellation" class="app-page" data-title="Our Constellation" hidden>
+        <div class="fw-hero"><div class="fw-kicker">A universe built by two</div><h2>Our Constellation <span style="color:#c59bdc">✧</span></h2><p>Every check-in, every little effort, every day you show up adds another point of light. Your sky is created from your shared activity — a constellation that grows with you.</p></div>
+        <div class="fw-card" style="margin-top:18px"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap"><div><div class="fw-label">THE SKY WE'RE MAKING</div><h3 id="fw-star-count">Your first stars are waiting</h3></div><span class="fw-chip" id="fw-streak-chip">♡ Still becoming</span></div><div class="fw-orbit" id="fw-orbit" aria-label="Interactive constellation of shared milestones"></div><div class="fw-star-info" id="fw-star-info" aria-live="polite">Tap a star to explore what it represents.</div><p class="fw-footnote">Stars are generated from existing mood check-ins and relationship milestones. They are visual celebrations, not a measure of how much you love each other.</p></div>
+      </section>
+      <section id="page-algorithm" class="app-page" data-title="The Us Algorithm" hidden>
+        <div class="fw-hero"><div class="fw-kicker">A little insight, never a judgement</div><h2>The Us Algorithm <span style="color:#c59bdc">✦</span></h2><p>Gentle activity-based suggestions for what might feel good today. This version uses your existing shared mood check-ins and simple rules — it doesn't diagnose emotions or read private conversations.</p><span class="fw-chip">♡ No AI API required</span><span class="fw-chip">✦ Refreshes from shared moods</span></div>
+        <div class="fw-grid"><div class="fw-card"><div class="fw-label">TODAY'S LITTLE INSIGHT</div><h3 id="fw-insight-title">Getting to know your rhythm</h3><p id="fw-insight-copy">As you both check in over time, this space will offer small, supportive ideas.</p><div class="fw-meter"><span id="fw-insight-meter" style="width:20%"></span></div><p class="fw-small" id="fw-insight-meta">Waiting for shared check-ins</p></div><div class="fw-card"><div class="fw-label">YOUR NEXT SMALL MOMENT</div><h3 id="fw-action-title">Start with one gentle question</h3><p id="fw-action-copy">Choose a small activity you can both enjoy without pressure.</p><button class="fw-button" id="fw-action-button" type="button" data-page-jump="questions">Open Question Corner ↗</button></div></div>
+        <div class="fw-card" style="margin-top:18px"><div class="fw-label">SUGGESTIONS FOR THE TWO OF YOU</div><div id="fw-recommendations"><p class="fw-small">Your personalised suggestions will appear after you check in.</p></div><p class="fw-footnote">Suggestions are based on simple patterns in the mood scores you have chosen to share. They are not psychological conclusions. Either of you can ignore any suggestion.</p><button class="fw-button ghost" id="fw-refresh-algorithm" type="button">Refresh suggestions ↻</button></div>
+      </section>
       <section id="page-notifications" class="app-page" data-title="Notifications" hidden><div class="page-heading"><p class="eyebrow">LITTLE REMINDERS</p><h1>Notifications</h1><p class="muted">The important things, gently remembered.</p></div><section class="panel feature-panel"><span class="feature-emoji">♧</span><h2>Notification centre</h2><p>In-app alerts will come first. Browser push can be added later.</p><div class="feature-status">Planned for a later stage</div></section></section>
       <section id="page-settings" class="app-page" data-title="Settings" hidden><div class="page-heading"><p class="eyebrow">MAKE IT YOURS</p><h1>Settings</h1><p class="muted">Your little world, your preferences.</p></div><section class="panel settings-panel"><h2>Our details</h2><div class="setting-row"><div><strong>Relationship started</strong><p class="muted small">21 July 2023</p></div><span>♡</span></div><div class="setting-row"><div><strong>Fattumi's birthday</strong><p class="muted small">20 January · repeats yearly</p></div><span>🎂</span></div><div class="setting-row"><div><strong>Juzzy's birthday</strong><p class="muted small">19 May · repeats yearly</p></div><span>🎂</span></div><p class="muted small">“Nisbat” (17 July) and “Barne” (25 January) are included as recurring special dates for now. You can change their labels and recurrence in a later settings stage.</p></section></section>
       <footer class="app-footer">made with care, for two <span class="accent">♡</span></footer>
     </main>
   </div>
-  <script type="module" src="./app.js"></script>
+  <script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+// Supabase publishable key is intended for browser use; RLS must protect all tables.
+const SUPABASE_URL = "https://ifwuzipbpzihxbtgpbyt.supabase.co";
+const SUPABASE_KEY = "sb_publishable_3Jh4eiETe8VJ0cWn7AwhtA_xrrxN-Rz";
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+const $ = (selector) => document.querySelector(selector);
+
+const authPanel = $("#auth-panel");
+const appShell = $("#app-shell");
+const authForm = $("#auth-form");
+const authStatus = $("#auth-status");
+const dashboardStatus = $("#dashboard-status");
+const moodStatus = $("#mood-status");
+const authSubmit = $("#auth-submit");
+let authMode = "login";
+let currentUser = null;
+let coupleId = null;
+let members = [];
+let selectedScore = null;
+let realtimeChannel = null;
+let loadingUserId = null;
+let savingMood = false;
+let moodRowsCache = [];
+let moodCalendarCursor = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+let selectedMoodDate = localDateKey(new Date());
+let calendarCursor = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+let selectedCalendarDate = new Date();
+
+const moodLabels = {
+  1: "Really difficult", 2: "Feeling very low", 3: "A little down",
+  4: "Not feeling great", 5: "Just okay", 6: "Doing alright",
+  7: "Feeling good", 8: "Really happy", 9: "Amazing", 10: "On top of the world"
+};
+
+// These are fixed, recurring dates, so the calendar costs nothing to run.
+// Observances can vary by country; these are presented as fun reminders.
+const specialDates = [
+  { month: 0, day: 20, title: "Fattumi's Birthday", emoji: "🎂", kind: "birthday" },
+  { month: 0, day: 25, title: "Barne", emoji: "💗", kind: "personal" },
+  { month: 1, day: 7, title: "Rose Day", emoji: "🌹", kind: "love" },
+  { month: 1, day: 8, title: "Propose Day", emoji: "💌", kind: "love" },
+  { month: 1, day: 9, title: "Chocolate Day", emoji: "🍫", kind: "love" },
+  { month: 1, day: 10, title: "Teddy Day", emoji: "🧸", kind: "love" },
+  { month: 1, day: 11, title: "Promise Day", emoji: "🤞", kind: "love" },
+  { month: 1, day: 12, title: "Hug Day", emoji: "🫂", kind: "love" },
+  { month: 1, day: 13, title: "Kiss Day", emoji: "😘", kind: "love" },
+  { month: 1, day: 14, title: "Valentine's Day · Love Day", emoji: "❤️", kind: "love" },
+  { month: 4, day: 19, title: "Juzzy's Birthday", emoji: "🎂", kind: "birthday" },
+  { month: 6, day: 17, title: "Nisbat", emoji: "💞", kind: "personal" },
+  { month: 6, day: 21, title: "Our Anniversary", emoji: "💖", kind: "anniversary" },
+  { month: 7, day: 1, title: "National Girlfriend Day", emoji: "🌷", kind: "love" },
+  { month: 7, day: 18, title: "National Couple's Day", emoji: "💑", kind: "love" },
+  { month: 9, day: 3, title: "National Boyfriend Day", emoji: "💐", kind: "love" }
+];
+
+function setStatus(node, message) { if (node) node.textContent = message || ""; }
+function clear(node) { if (node) node.replaceChildren(); }
+function el(tag, className, text) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (text !== undefined) node.textContent = text;
+  return node;
+}
+function localDateKey(date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+function parseDateKey(key) {
+  const [year, month, day] = key.split("-").map(Number);
+  return new Date(year, month - 1, day);
+}
+function sameDay(a, b) {
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
+function formatDate(value) {
+  if (!value) return "Time unavailable";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Time unavailable";
+  return new Intl.DateTimeFormat("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" }).format(date) + " IST";
+}
+function timeAgo(value) {
+  const timestamp = new Date(value).getTime();
+  if (!Number.isFinite(timestamp)) return "";
+  const minutes = Math.max(0, Math.floor((Date.now() - timestamp) / 60000));
+  if (minutes < 1) return "Just now";
+  if (minutes < 60) return `${minutes} min ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} hr ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 30) return `${days} day(s) ago`;
+  return formatDate(value);
+}
+function setAuthMode(mode) {
+  authMode = mode;
+  $("#login-tab").classList.toggle("active", mode === "login");
+  $("#signup-tab").classList.toggle("active", mode === "signup");
+  authSubmit.textContent = mode === "login" ? "Log in" : "Create account";
+  $("#password").autocomplete = mode === "login" ? "current-password" : "new-password";
+  setStatus(authStatus, "");
+}
+$("#login-tab").addEventListener("click", () => setAuthMode("login"));
+$("#signup-tab").addEventListener("click", () => setAuthMode("signup"));
+
+authForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const email = $("#email").value.trim();
+  const password = $("#password").value;
+  authSubmit.disabled = true;
+  setStatus(authStatus, "Please wait…");
+  try {
+    if (authMode === "signup") {
+      const { data, error } = await supabase.auth.signUp({
+        email, password,
+        options: { emailRedirectTo: "https://maverick0052-bit.github.io/Fuzzy-World/" }
+      });
+      if (error) throw error;
+      if (data.session) {
+        setStatus(authStatus, "Account created. Opening your space…");
+        await handleSession(data.session);
+      } else {
+        setStatus(authStatus, "Account created. Check your email to confirm it, then log in.");
+      }
+    } else {
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      await handleSession(data.session);
+    }
+  } catch (error) {
+    setStatus(authStatus, error.message || "Authentication failed.");
+  } finally {
+    authSubmit.disabled = false;
+  }
+});
+
+function showLoggedOut() {
+  if (realtimeChannel) { supabase.removeChannel(realtimeChannel); realtimeChannel = null; }
+  currentUser = null; coupleId = null; members = []; selectedScore = null; loadingUserId = null; savingMood = false;
+  authPanel.hidden = false; appShell.hidden = true;
+  clear($("#mood-cards")); clear($("#mood-history")); moodRowsCache = [];
+  activeQuestionDate = null; activeQuestionSetId = null; activeQuestionRows = []; activeQuestionAnswers = [];
+  clear($("#my-questions-list")); clear($("#shared-answer-reveal")); clear($("#question-history-list"));
+  clear($("#ask-question-list")); setStatus($("#ask-question-status"), ""); setStatus($("#ask-list-status"), "");
+  $("#mood-note").value = ""; $("#save-mood").disabled = true;
+  $("#mood-picker").querySelectorAll("button").forEach(button => {
+    button.classList.remove("selected"); button.setAttribute("aria-pressed", "false");
+  });
+}
+
+$("#logout-button").addEventListener("click", async () => {
+  setStatus(dashboardStatus, "Logging out…");
+  const { error } = await supabase.auth.signOut();
+  if (error) setStatus(dashboardStatus, error.message);
+  else { showLoggedOut(); setStatus(authStatus, "You have logged out."); }
+});
+
+function selectMood(score) {
+  selectedScore = score;
+  $("#mood-picker").querySelectorAll("button").forEach(button => {
+    const active = Number(button.dataset.score) === score;
+    button.classList.toggle("selected", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+  $("#selected-mood").textContent = `${score}/10 — ${moodLabels[score]}`;
+  $("#save-mood").disabled = savingMood || !coupleId;
+}
+$("#mood-picker").addEventListener("click", event => {
+  const button = event.target.closest("button[data-score]");
+  if (button) selectMood(Number(button.dataset.score));
+});
+
+async function handleSession(session) {
+  if (!session?.user) { showLoggedOut(); return; }
+  const user = session.user;
+  if (loadingUserId === user.id && currentUser?.id === user.id) return;
+  if (realtimeChannel) { await supabase.removeChannel(realtimeChannel); realtimeChannel = null; }
+  loadingUserId = user.id; currentUser = user; coupleId = null; members = [];
+  authPanel.hidden = true; appShell.hidden = false;
+  setStatus(dashboardStatus, "Connecting to your shared space…");
+  clear($("#mood-cards")); clear($("#mood-history")); moodRowsCache = [];
+  try {
+    const { data: ownMembership, error: memberError } = await supabase
+      .from("couple_members").select("couple_id, user_id, role").eq("user_id", user.id).maybeSingle();
+    if (memberError) throw memberError;
+    if (!ownMembership) {
+      setStatus(dashboardStatus, "Your account is ready, but the shared space isn't linked to both accounts yet.");
+      renderMoodCards([]); return;
+    }
+    coupleId = ownMembership.couple_id;
+    const { data: memberRows, error: membersError } = await supabase
+      .from("couple_members").select("couple_id, user_id, role").eq("couple_id", coupleId);
+    if (membersError) throw membersError;
+    members = memberRows || [];
+    if (members.length !== 2) {
+      setStatus(dashboardStatus, "Your shared space needs both partner accounts linked.");
+      renderMoodCards([]); return;
+    }
+    const { data: couple, error: coupleError } = await supabase.from("couples").select("name").eq("id", coupleId).single();
+    if (coupleError) throw coupleError;
+    const brandName = couple?.name || "fuzzy world";
+    document.querySelectorAll(".sidebar-brand-text,.mobile-topbar .brand span:last-child,.auth-brand span:last-child").forEach(node => node.textContent = brandName);
+    subscribeToMoods(coupleId);
+    await refreshMoods();
+    if (!$("#page-questions").hidden) await loadQuestionDay(istDateKey(), true);
+    if (!$("#page-ask").hidden) await loadAskQuestions();
+    if (currentUser?.id === user.id) setStatus(dashboardStatus, "Your shared space is connected ♡");
+  } catch (error) {
+    console.error("Dashboard initialization failed:", error);
+    setStatus(dashboardStatus, "Couldn't load your shared space. Check your connection and database setup.");
+  }
+}
+
+async function refreshMoods() {
+  if (!currentUser || !coupleId) return;
+  const expectedUserId = currentUser.id;
+  const expectedCoupleId = coupleId;
+  const allRows = []; const pageSize = 500; let offset = 0;
+  while (true) {
+    const { data, error } = await supabase.from("mood_updates")
+      .select("id, user_id, score, note, created_at").eq("couple_id", expectedCoupleId)
+      .order("created_at", { ascending: false }).range(offset, offset + pageSize - 1);
+    if (error) { console.error("Mood refresh failed:", error); setStatus(dashboardStatus, "Couldn't refresh moods. Please retry."); return; }
+    allRows.push(...(data || []));
+    if (!data || data.length < pageSize) break;
+    offset += pageSize;
+  }
+  if (currentUser?.id !== expectedUserId || coupleId !== expectedCoupleId) return;
+  moodRowsCache = allRows; renderMoodCards(moodRowsCache); renderMoodHistory(moodRowsCache); renderMoodCalendar(); renderMoodDayDetail(selectedMoodDate);
+}
+function getPersonName(userId) {
+  if (userId === currentUser?.id) return "You";
+  return "Your person";
+}
+function latestPerPerson(rows) {
+  const latest = new Map();
+  for (const row of rows) if (!latest.has(row.user_id)) latest.set(row.user_id, row);
+  return latest;
+}
+function renderMoodCards(rows) {
+  const container = $("#mood-cards"); clear(container);
+  const latest = latestPerPerson(rows);
+  const sortedMembers = [...members].sort((a, b) => (a.role || "").localeCompare(b.role || ""));
+  if (!sortedMembers.length) {
+    container.append(el("p", "muted", "Your two mood cards will appear here once both accounts are linked."));
+    return;
+  }
+  for (const member of sortedMembers) {
+    const mood = latest.get(member.user_id);
+    const card = el("article", "mood-card");
+    card.append(el("p", "person", getPersonName(member.user_id)));
+    if (!mood) {
+      card.append(el("div", "mood-score", "—"), el("p", "description muted", "No mood shared yet"), el("p", "timestamp", "Waiting for the first check-in"));
+    } else {
+      card.append(el("div", "mood-score", `${mood.score}/10`), el("p", "description", moodLabels[mood.score]), el("p", "timestamp", `Last changed: ${formatDate(mood.created_at)}`), el("p", "timestamp", timeAgo(mood.created_at)));
+      if (mood.note) card.append(el("p", "note", mood.note));
+    }
+    container.append(card);
+  }
+}
+function renderMoodHistory(rows) {
+  const container = $("#mood-history"); clear(container);
+  const personFilter = $("#mood-history-person")?.value || "all";
+  const search = ($("#mood-history-search")?.value || "").trim().toLowerCase();
+  const filtered = rows.filter(mood => {
+    const personMatch = personFilter === "all" || (personFilter === "me" ? mood.user_id === currentUser?.id : mood.user_id !== currentUser?.id);
+    return personMatch && (!search || (mood.note || "").toLowerCase().includes(search));
+  });
+  const count = $("#mood-history-count");
+  if (count) count.textContent = `${filtered.length} ${filtered.length === 1 ? "check-in" : "check-ins"} shown · newest first`;
+  if (!filtered.length) { container.append(el("p", "muted", rows.length ? "No check-ins match these filters." : "No moods yet. Your first check-in starts your story ♡")); return; }
+  for (const mood of filtered.slice(0, 100)) {
+    const item = el("article", "history-item");
+    const score = el("div", "history-score", mood.score);
+    const main = el("div", "history-main");
+    main.append(el("p", "history-person", `${getPersonName(mood.user_id)} · ${moodLabels[mood.score]}`), el("p", "timestamp", formatDate(mood.created_at)));
+    if (mood.note) main.append(el("p", "note", mood.note));
+    item.append(score, main); container.append(item);
+  }
+  if (filtered.length > 100) container.append(el("p", "muted small", "Showing the latest 100 matching check-ins."));
+}
+function moodRowsForDate(dateKey) {
+  return moodRowsCache.filter(row => localDateKey(new Date(row.created_at)) === dateKey);
+}
+function renderMoodCalendar() {
+  const heading = $("#mood-calendar-month"); const grid = $("#mood-calendar-days");
+  if (!heading || !grid) return;
+  const year = moodCalendarCursor.getFullYear(), month = moodCalendarCursor.getMonth();
+  heading.textContent = new Intl.DateTimeFormat("en-IN", { month: "long", year: "numeric" }).format(moodCalendarCursor);
+  clear(grid);
+  const first = new Date(year, month, 1); const offset = (first.getDay() + 6) % 7;
+  const start = new Date(year, month, 1 - offset);
+  for (let i = 0; i < 42; i++) {
+    const date = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+    const key = localDateKey(date); const rows = moodRowsForDate(key);
+    const button = el("button", "calendar-day mood-calendar-day", String(date.getDate()));
+    if (date.getMonth() !== month) button.classList.add("outside");
+    if (sameDay(date, new Date())) button.classList.add("today");
+    if (rows.length) button.classList.add("has-mood");
+    if (key === selectedMoodDate) button.classList.add("selected");
+    button.setAttribute("aria-label", `${new Intl.DateTimeFormat("en-IN", { dateStyle: "full" }).format(date)}${rows.length ? `, ${rows.length} mood check-in(s)` : ", no mood check-ins"}`);
+    if (rows.length) button.append(el("span", "mood-day-dot", "•"));
+    button.addEventListener("click", () => { selectedMoodDate = key; if (date.getMonth() !== moodCalendarCursor.getMonth()) moodCalendarCursor = new Date(date.getFullYear(), date.getMonth(), 1); renderMoodCalendar(); renderMoodDayDetail(key); });
+    grid.append(button);
+  }
+}
+function renderMoodDayDetail(dateKey) {
+  const box = $("#mood-day-detail"); if (!box) return; clear(box);
+  const date = parseDateKey(dateKey); const rows = moodRowsForDate(dateKey);
+  box.append(el("h3", "mood-detail-date", new Intl.DateTimeFormat("en-IN", { dateStyle: "full" }).format(date)));
+  if (!rows.length) { box.append(el("p", "muted small", "No saved mood check-ins for this date. Every day is still part of your story ♡")); return; }
+  for (const mood of rows) {
+    const item = el("article", "mood-detail-item");
+    item.append(el("span", "history-score mood-detail-score", String(mood.score)));
+    const content = el("div", "mood-detail-content");
+    content.append(el("p", "history-person", `${getPersonName(mood.user_id)} · ${moodLabels[mood.score]}`), el("p", "timestamp", formatDate(mood.created_at)));
+    if (mood.note) content.append(el("p", "note", mood.note));
+    item.append(content); box.append(item);
+  }
+}
+$("#mood-calendar-prev")?.addEventListener("click", () => { moodCalendarCursor = new Date(moodCalendarCursor.getFullYear(), moodCalendarCursor.getMonth() - 1, 1); renderMoodCalendar(); });
+$("#mood-calendar-next")?.addEventListener("click", () => { moodCalendarCursor = new Date(moodCalendarCursor.getFullYear(), moodCalendarCursor.getMonth() + 1, 1); renderMoodCalendar(); });
+$("#mood-history-person")?.addEventListener("change", () => renderMoodHistory(moodRowsCache));
+$("#mood-history-search")?.addEventListener("input", () => renderMoodHistory(moodRowsCache));
+$("#mood-history-refresh")?.addEventListener("click", () => refreshMoods());
+
+function subscribeToMoods(id) {
+  if (realtimeChannel) supabase.removeChannel(realtimeChannel);
+  realtimeChannel = supabase.channel(`moods-${id}`).on("postgres_changes", {
+    event: "*", schema: "public", table: "mood_updates", filter: `couple_id=eq.${id}`
+  }, () => refreshMoods()).subscribe(status => {
+    if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") setStatus(dashboardStatus, "Live updates disconnected. Refresh the page if needed.");
+  });
+}
+$("#save-mood").addEventListener("click", async () => {
+  if (!currentUser || !coupleId || selectedScore === null || savingMood) return;
+  savingMood = true;
+  const button = $("#save-mood"); button.disabled = true; button.textContent = "Saving…"; setStatus(moodStatus, "");
+  try {
+    const { error } = await supabase.from("mood_updates").insert({ couple_id: coupleId, user_id: currentUser.id, score: selectedScore, note: $("#mood-note").value.trim() || null });
+    if (error) throw error;
+    $("#mood-note").value = ""; setStatus(moodStatus, "Mood saved successfully ♡"); await refreshMoods();
+  } catch (error) {
+    console.error("Mood save failed:", error); setStatus(moodStatus, "Couldn't save your mood. Please try again.");
+  } finally {
+    savingMood = false; button.textContent = "Save my mood ♡"; button.disabled = selectedScore === null || !coupleId;
+  }
+});
+
+
+// Stage 3: free daily Question Corner. Dates are always calculated in India Standard Time.
+const dailyQuestionBank = [
+  { prompt: "Which tiny thing makes you feel most loved?", options: ["A thoughtful message", "Quality time", "A warm hug", "Little acts of care"] },
+  { prompt: "Our ideal slow day together would be…", options: ["A cosy movie day", "A long drive", "Trying a new café", "Staying in and talking"] },
+  { prompt: "What kind of surprise would make you smile most?", options: ["A handwritten note", "A favourite snack", "A planned date", "A small meaningful gift"] },
+  { prompt: "When you have a hard day, what helps most?", options: ["Being listened to", "A hug and comfort", "A little distraction", "Some quiet time, then a chat"] },
+  { prompt: "Which memory would you happily relive?", options: ["Our first meeting", "A favourite date", "A silly moment", "A time we supported each other"] },
+  { prompt: "Pick a perfect date-night vibe.", options: ["Dress up and go out", "Street food and a walk", "Games and laughter", "Candles and deep talks"] },
+  { prompt: "Which message would brighten your day?", options: ["I miss you", "I'm proud of you", "Tell me everything", "I've got you"] },
+  { prompt: "What's your favourite kind of affection?", options: ["Holding hands", "Long hugs", "Sweet words", "Thoughtful little actions"] },
+  { prompt: "If we had a free weekend, we'd…", options: ["Explore somewhere new", "Have a home date", "Meet for food", "Make a spontaneous plan"] },
+  { prompt: "What should we make more time for?", options: ["Deep conversations", "Fun dates", "Taking photos", "Resting together"] },
+  { prompt: "Choose a couple tradition to start.", options: ["Monthly date day", "Goodnight voice notes", "A shared photo album", "Weekly check-in"] },
+  { prompt: "Which little gift feels most personal?", options: ["A letter", "A playlist", "A photo keepsake", "Something I mentioned once"] },
+  { prompt: "When we disagree, what matters most?", options: ["Listening without interrupting", "Taking a calm pause", "Being honest and gentle", "Finding a solution together"] },
+  { prompt: "Which place sounds most romantic to you?", options: ["By the sea", "A quiet garden", "A cosy room", "A city at night"] },
+  { prompt: "What would you like us to learn together?", options: ["Cooking something new", "A game or sport", "Photography or editing", "A language or skill"] },
+  { prompt: "Which is the sweetest everyday ritual?", options: ["Morning check-in", "Sharing a song", "Goodnight message", "Asking how the day went"] },
+  { prompt: "Pick our imaginary couple mascot.", options: ["Two sleepy cats", "Tiny teddy bears", "Two silly penguins", "A pair of lovebirds"] },
+  { prompt: "What makes an apology feel sincere?", options: ["Taking responsibility", "Listening to my feelings", "Changing the behaviour", "A calm honest conversation"] },
+  { prompt: "Which kind of memory should we collect more?", options: ["Everyday candid photos", "Screenshots of sweet chats", "Notes from dates", "Funny moments and inside jokes"] },
+  { prompt: "What's the best way to celebrate a small win?", options: ["Cheering each other on", "A little treat", "A celebratory call", "Planning something fun"] },
+  { prompt: "Choose a comfort combo.", options: ["Tea and a long chat", "Food and a show", "Music and a drive", "A hug and quiet time"] },
+  { prompt: "What do you want more of in our future?", options: ["New adventures", "Peaceful routines", "Shared goals", "More time together"] },
+  { prompt: "Which compliment stays with you longest?", options: ["You understand me", "You make me feel safe", "You inspire me", "You notice the little things"] },
+  { prompt: "Pick a theme for our next date.", options: ["Childhood favourites", "Dress-up night", "No-phone time", "Surprise each other"] },
+  { prompt: "When do you feel most connected to me?", options: ["When we laugh", "When we share honestly", "When we do ordinary things", "When we support each other"] },
+  { prompt: "Which shared project sounds fun?", options: ["A bucket list", "A playlist together", "A scrapbook", "A recipe collection"] },
+  { prompt: "What's a lovely way to reconnect after a busy day?", options: ["A quick voice note", "A proper catch-up", "A funny meme", "A little reassurance"] },
+  { prompt: "Choose a tiny adventure.", options: ["Sunrise walk", "Late-night snack run", "Unplanned bus/train trip", "Find a new local spot"] },
+  { prompt: "What should we protect in our relationship?", options: ["Trust", "Kindness during stress", "Time for each other", "Honest communication"] },
+  { prompt: "Pick a future keepsake for us.", options: ["A jar of little notes", "A printed photo book", "A map of places visited", "A box of date memories"] }
+];
+const sharedWrittenBank = [
+  "What's one small moment with me that made you feel genuinely cared for?",
+  "What's something you'd love for us to experience together one day, and why?",
+  "What's one thing I do that makes ordinary days feel special?",
+  "Describe a memory of us that you hope we never forget.",
+  "What's one way we can make each other feel more understood this week?",
+  "If we could plan a perfect day together with no budget or time limits, what would it look like?",
+  "What's something about our relationship that you're proud of?",
+  "What's one little tradition you'd love us to start and keep for years?",
+  "When do you feel safest being fully yourself with me?",
+  "What's something new you'd like us to learn about each other?",
+  "Write a tiny thank-you note for something I may not realise matters to you.",
+  "Imagine us reading this answer a year from now. What do you hope we'll have done together?"
+];
+let activeQuestionDate = null;
+let activeQuestionSetId = null;
+let activeQuestionRows = [];
+let activeQuestionAnswers = [];
+let loadingQuestionDay = false;
+let savingQuestionAnswers = false;
+
+function istDateKey(date = new Date()) {
+  const parts = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(date);
+  const values = Object.fromEntries(parts.map(part => [part.type, part.value]));
+  return `${values.year}-${values.month}-${values.day}`;
+}
+function stableHash(text) {
+  let hash = 2166136261;
+  for (let i = 0; i < text.length; i++) { hash ^= text.charCodeAt(i); hash = Math.imul(hash, 16777619); }
+  return hash >>> 0;
+}
+function seededShuffle(items, seed) {
+  const result = [...items]; let state = seed >>> 0;
+  for (let i = result.length - 1; i > 0; i--) {
+    state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
+    const j = state % (i + 1); [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+function makeDailyQuestionPayload(dateKey) {
+  // One shared set of five MCQs, plus one shared written prompt for both partners.
+  const seed = stableHash(`${coupleId}:${dateKey}`);
+  const picked = seededShuffle(dailyQuestionBank, seed).slice(0, 5);
+  const payload = picked.map((q, index) => ({ slot_no: index + 1, audience_user_id: null, question_type: "mcq", prompt: q.prompt, options: q.options }));
+  const written = seededShuffle(sharedWrittenBank, seed ^ 0x9e3779b9)[0];
+  payload.push({ slot_no: 0, audience_user_id: null, question_type: "written", prompt: written, options: [] });
+  return payload;
+}
+function ownQuestionRows(rows = activeQuestionRows) { return rows.filter(row => row.question_type === "mcq").sort((a,b) => a.slot_no - b.slot_no); }
+function answerFor(questionId, userId = currentUser?.id, rows = activeQuestionAnswers) { return rows.find(row => row.question_id === questionId && row.user_id === userId); }
+function otherMemberId() { return members.find(member => member.user_id !== currentUser?.id)?.user_id || null; }
+function personLabel(userId) { return userId === currentUser?.id ? "You" : "Fattumi"; }
+
+async function ensureQuestionSet(dateKey) {
+  const { data: existing, error: findError } = await supabase.from("daily_question_sets").select("id, question_date").eq("couple_id", coupleId).eq("question_date", dateKey).maybeSingle();
+  if (findError) throw findError;
+  let set = existing;
+  if (!set) {
+    const { data: inserted, error: insertError } = await supabase.from("daily_question_sets").insert({ couple_id: coupleId, question_date: dateKey, created_by: currentUser.id }).select("id, question_date").single();
+    if (insertError && insertError.code !== "23505") throw insertError;
+    if (inserted) set = inserted;
+    else {
+      const { data: raced, error: racedError } = await supabase.from("daily_question_sets").select("id, question_date").eq("couple_id", coupleId).eq("question_date", dateKey).single();
+      if (racedError) throw racedError;
+      set = raced;
+    }
+  }
+  const { data: existingQuestions, error: questionError } = await supabase.from("daily_questions").select("id, set_id, slot_no, audience_user_id, question_type, prompt, options").eq("set_id", set.id);
+  if (questionError) throw questionError;
+  if ((existingQuestions || []).length < 6) {
+    const payload = makeDailyQuestionPayload(dateKey).map(question => ({ ...question, set_id: set.id }));
+    const { error: seedError } = await supabase.from("daily_questions").upsert(payload, { onConflict: "set_id,slot_no,audience_user_id", ignoreDuplicates: true });
+    if (seedError) throw seedError;
+  }
+  return set;
+}
+
+async function loadQuestionDay(dateKey = istDateKey(), allowCreate = true) {
+  if (!currentUser || !coupleId || members.length !== 2 || loadingQuestionDay) return;
+  loadingQuestionDay = true;
+  activeQuestionDate = dateKey;
+  setStatus($("#question-page-status"), "Loading your questions…");
+  try {
+    let set;
+    if (allowCreate && dateKey === istDateKey()) set = await ensureQuestionSet(dateKey);
+    else {
+      const { data, error } = await supabase.from("daily_question_sets").select("id, question_date").eq("couple_id", coupleId).eq("question_date", dateKey).maybeSingle();
+      if (error) throw error;
+      set = data;
+    }
+    activeQuestionSetId = set?.id || null;
+    activeQuestionRows = [];
+    activeQuestionAnswers = [];
+    if (set) {
+      const { data: questionRows, error: qError } = await supabase.from("daily_questions").select("id, set_id, slot_no, audience_user_id, question_type, prompt, options").eq("set_id", set.id).order("slot_no", { ascending: true });
+      if (qError) throw qError;
+      activeQuestionRows = questionRows || [];
+      const questionIds = activeQuestionRows.map(row => row.id);
+      if (questionIds.length) {
+        const { data: answers, error: aError } = await supabase.from("daily_answers").select("id, question_id, user_id, answer, updated_at").in("question_id", questionIds);
+        if (aError) throw aError;
+        activeQuestionAnswers = answers || [];
+      }
+    }
+    renderQuestionDay();
+    await refreshQuestionHistory(false);
+    setStatus($("#question-page-status"), set ? "Your questions are saved for this day ♡" : "No saved questions for this day yet.");
+  } catch (error) {
+    console.error("Question Corner load failed:", error);
+    setStatus($("#question-page-status"), "Couldn't load Question Corner. Please check the Stage 3 SQL setup and try Refresh.");
+  } finally { loadingQuestionDay = false; }
+}
+
+function renderQuestionDay() {
+  const dateTitle = activeQuestionDate ? new Intl.DateTimeFormat("en-IN", { dateStyle: "full", timeZone: "Asia/Kolkata" }).format(new Date(`${activeQuestionDate}T12:00:00+05:30`)) : "Today's questions";
+  $("#question-date-title").textContent = dateTitle;
+  const mine = ownQuestionRows();
+  const isToday = activeQuestionDate === istDateKey();
+  const partnerId = otherMemberId();
+  $("#my-question-heading").textContent = isToday ? "Your side" : "Your answers from this day";
+  const answered = mine.filter(q => !!answerFor(q.id)).length;
+  $("#my-question-progress").textContent = `${answered} / 5 answered`;
+  const list = $("#my-questions-list"); clear(list);
+  if (!activeQuestionSetId || mine.length !== 5) {
+    list.append(el("p", "muted", "This day has no saved challenge yet. Open today’s challenge to create it.") );
+  } else {
+    mine.forEach((question, index) => {
+      const card = el("article", "question-card");
+      card.append(el("p", "question-number", `Question ${index + 1} · ${answerFor(question.id) ? "Answered" : "Waiting for you"} `));
+      card.append(el("h3", "", question.prompt));
+      const options = el("div", "question-options");
+      const saved = answerFor(question.id);
+      (question.options || []).forEach(option => {
+        const label = el("label", "question-option");
+        const input = document.createElement("input"); input.type = "radio"; input.name = `q-${question.id}`; input.value = option; input.checked = saved?.answer === option; input.disabled = !isToday || !!saved;
+        label.append(input, el("span", "", option)); options.append(label);
+      });
+      card.append(options);
+      if (!isToday) card.append(el("p", "question-locked", "Past-day answers are read-only."));
+      if (saved && partnerId) {
+        const partnerAnswer = answerFor(question.id, partnerId);
+        const reveal = el("div", "answer-reveal");
+        if (partnerAnswer) { const bubble = el("div", "answer-bubble"); bubble.append(el("strong", "", "Your person's answer ♡"), el("p", "", partnerAnswer.answer)); reveal.append(bubble); }
+        else reveal.append(el("p", "answer-waiting", "Your answer is saved. Your person's answer will appear here after they answer this question. ♡"));
+        card.append(reveal);
+      }
+      list.append(card);
+    });
+  }
+  $("#save-my-answers").hidden = !isToday;
+  $("#save-my-answers").disabled = savingQuestionAnswers || !mine.some(q => !answerFor(q.id));
+  const written = activeQuestionRows.find(row => row.question_type === "written");
+  $("#shared-question-prompt").textContent = written?.prompt || "No written question saved for this day.";
+  const ownWrittenAnswer = written ? answerFor(written.id) : null;
+  $("#shared-answer-input").value = ownWrittenAnswer?.answer || "";
+  $("#shared-answer-input").disabled = !isToday || !!ownWrittenAnswer || !written;
+  $("#save-shared-answer").hidden = !isToday;
+  $("#save-shared-answer").disabled = savingQuestionAnswers || !written || !!ownWrittenAnswer;
+  renderSharedAnswerReveal(written, partnerId);
+  if (ownWrittenAnswer) setStatus($("#shared-question-status"), "Your written answer is saved ♡");
+  else setStatus($("#shared-question-status"), "");
+  setStatus($("#my-question-status"), "");
+}
+function renderSharedAnswerReveal(written, partnerId) {
+  const box = $("#shared-answer-reveal"); clear(box);
+  if (!written) return;
+  const own = answerFor(written.id);
+  const partner = partnerId ? answerFor(written.id, partnerId) : null;
+  if (own) { const bubble = el("div", "answer-bubble"); bubble.append(el("strong", "", "Your answer ♡"), el("p", "", own.answer)); box.append(bubble); }
+  if (partner && own) { const bubble = el("div", "answer-bubble"); bubble.append(el("strong", "", "Your person's answer ♡"), el("p", "", partner.answer)); box.append(bubble); }
+  else if (own && !partner) box.append(el("p", "answer-waiting", "Your answer is saved privately. You'll both see each other's written answers here after your person has answered too. ♡"));
+  else if (!own) box.append(el("p", "answer-waiting", "Your answer stays private until both of you have answered this shared question."));
+}
+
+async function saveQuestionAnswer(questionId, answer) {
+  const { error } = await supabase.from("daily_answers").upsert({ question_id: questionId, user_id: currentUser.id, answer, updated_at: new Date().toISOString() }, { onConflict: "question_id,user_id" });
+  if (error) throw error;
+}
+$("#save-my-answers").addEventListener("click", async () => {
+  if (savingQuestionAnswers || activeQuestionDate !== istDateKey()) return;
+  savingQuestionAnswers = true; const button = $("#save-my-answers"); button.disabled = true; button.textContent = "Saving your answers…";
+  try {
+    const mine = ownQuestionRows();
+    for (const question of mine) {
+      if (answerFor(question.id)) continue;
+      const checked = document.querySelector(`input[name="q-${question.id}"]:checked`);
+      if (checked) await saveQuestionAnswer(question.id, checked.value);
+    }
+    setStatus($("#my-question-status"), "Your answers are saved ♡");
+    await loadQuestionDay(istDateKey(), false);
+  } catch (error) { console.error(error); setStatus($("#my-question-status"), "Couldn't save all answers. Please try again."); }
+  finally { savingQuestionAnswers = false; button.textContent = "Save my answers ♡"; button.disabled = !ownQuestionRows().some(q => !answerFor(q.id)); }
+});
+$("#save-shared-answer").addEventListener("click", async () => {
+  if (savingQuestionAnswers || activeQuestionDate !== istDateKey()) return;
+  const written = activeQuestionRows.find(row => row.question_type === "written");
+  const answer = $("#shared-answer-input").value.trim();
+  if (!written || !answer) { setStatus($("#shared-question-status"), "Write a little answer before saving ♡"); return; }
+  savingQuestionAnswers = true; $("#save-shared-answer").disabled = true;
+  try { await saveQuestionAnswer(written.id, answer); setStatus($("#shared-question-status"), "Your answer is saved privately ♡"); await loadQuestionDay(istDateKey(), false); }
+  catch (error) { console.error(error); setStatus($("#shared-question-status"), "Couldn't save your answer. Please try again."); }
+  finally { savingQuestionAnswers = false; }
+});
+
+async function refreshQuestionHistory(showStatus = true) {
+  if (!currentUser || !coupleId) return;
+  const list = $("#question-history-list");
+  if (showStatus) setStatus($("#question-page-status"), "Refreshing saved days…");
+  try {
+    const { data, error } = await supabase.from("daily_question_sets").select("id, question_date").eq("couple_id", coupleId).order("question_date", { ascending: false }).limit(90);
+    if (error) throw error;
+    clear(list);
+    const rows = data || [];
+    if (!rows.length) { list.append(el("p", "muted small", "Your saved question days will appear here.")); return; }
+    rows.forEach(set => {
+      const button = el("button", `question-history-day${set.question_date === activeQuestionDate ? " active" : ""}`, new Intl.DateTimeFormat("en-IN", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Kolkata" }).format(new Date(`${set.question_date}T12:00:00+05:30`)));
+      button.type = "button"; button.addEventListener("click", () => loadQuestionDay(set.question_date, false)); list.append(button);
+    });
+  } catch (error) { console.error("Question history failed:", error); if (showStatus) setStatus($("#question-page-status"), "Couldn't load question history. Check the Stage 3 SQL setup."); }
+}
+$("#question-history-refresh").addEventListener("click", () => refreshQuestionHistory(true));
+
+
+// Stage 4 Part A: shared questions for the couple.
+let loadingAskQuestions = false;
+function askPersonLabel(userId) {
+  if (userId === currentUser?.id) return "You asked";
+  const index = members.findIndex(member => member.user_id === userId);
+  return index >= 0 ? "Your person asked" : "Your person asked";
+}
+function makeQuestionCard(question) {
+  const card = el("article", "ask-question-card");
+  const meta = el("div", "ask-question-meta");
+  meta.append(el("span", "ask-question-author", askPersonLabel(question.asker_id)));
+  meta.append(el("span", "timestamp", formatDate(question.created_at)));
+  card.append(meta);
+
+  const questionText = el("p", "ask-question-text", question.question);
+  card.append(questionText);
+  const answered = Boolean(question.answered_at && question.answer);
+  const isAsker = question.asker_id === currentUser?.id;
+  if (answered) {
+    const answerBox = el("div", "ask-answer-box");
+    answerBox.append(el("p", "eyebrow", "ANSWER · BOTH OF YOU CAN SEE THIS"));
+    answerBox.append(el("p", "ask-answer-text", question.answer));
+    answerBox.append(el("p", "timestamp", `Answered ${formatDate(question.answered_at)}`));
+    card.append(answerBox);
+    card.append(el("span", "ask-locked-label", "♡ Answered · question locked"));
+  } else if (isAsker) {
+    const editForm = el("form", "ask-inline-form");
+    const label = el("label", "", "Edit your question (until your person answers)");
+    const input = el("textarea", "ask-edit-input", question.question);
+    input.rows = 2; input.maxLength = 500; input.required = true;
+    const save = el("button", "secondary", "Save edit"); save.type = "submit";
+    editForm.append(label, input, save);
+    editForm.addEventListener("submit", async event => {
+      event.preventDefault();
+      const nextQuestion = input.value.trim();
+      if (!nextQuestion || nextQuestion.length > 500) return;
+      save.disabled = true;
+      try {
+        const { data: updated, error } = await supabase.from("couple_questions").update({ question: nextQuestion }).eq("id", question.id).eq("asker_id", currentUser.id).is("answered_at", null).select("id").maybeSingle();
+        if (error) throw error;
+        if (!updated) throw new Error("Question is already answered or unavailable.");
+        setStatus($("#ask-list-status"), "Your question was updated ♡");
+        await loadAskQuestions();
+      } catch (error) {
+        console.error("Question edit failed:", error);
+        setStatus($("#ask-list-status"), "Couldn't edit that question. It may already have been answered.");
+      } finally { save.disabled = false; }
+    });
+    card.append(editForm);
+    card.append(el("p", "ask-locked-label", "Waiting for your person to answer…"));
+  } else {
+    const answerForm = el("form", "ask-inline-form");
+    const label = el("label", "", "Your answer");
+    const input = el("textarea", "ask-answer-input", "");
+    input.rows = 3; input.maxLength = 1200; input.required = true;
+    input.placeholder = "Write your answer here…";
+    const save = el("button", "primary", "Send answer ♡"); save.type = "submit";
+    answerForm.append(label, input, save);
+    answerForm.addEventListener("submit", async event => {
+      event.preventDefault();
+      const answer = input.value.trim();
+      if (!answer || answer.length > 1200) return;
+      save.disabled = true;
+      try {
+        const { data: updated, error } = await supabase.from("couple_questions").update({ answer, answered_by: currentUser.id, answered_at: new Date().toISOString() }).eq("id", question.id).is("answered_at", null).select("id").maybeSingle();
+        if (error) throw error;
+        if (!updated) throw new Error("Question has already been answered or is unavailable.");
+        setStatus($("#ask-list-status"), "Answer saved — you can both see it now ♡");
+        await loadAskQuestions();
+      } catch (error) {
+        console.error("Question answer failed:", error);
+        setStatus($("#ask-list-status"), "Couldn't save your answer. It may already have been answered.");
+      } finally { save.disabled = false; }
+    });
+    card.append(answerForm);
+  }
+  return card;
+}
+async function loadAskQuestions() {
+  if (!currentUser || !coupleId || loadingAskQuestions) return;
+  loadingAskQuestions = true;
+  const list = $("#ask-question-list");
+  try {
+    const { data, error } = await supabase.from("couple_questions")
+      .select("id, couple_id, asker_id, question, answer, answered_by, answered_at, created_at, updated_at")
+      .eq("couple_id", coupleId).order("created_at", { ascending: false }).limit(100);
+    if (error) throw error;
+    clear(list);
+    if (!data?.length) {
+      list.append(el("p", "muted small", "No questions yet. Start with something sweet, curious, or meaningful. ♡"));
+      return;
+    }
+    data.forEach(question => list.append(makeQuestionCard(question)));
+    setStatus($("#ask-list-status"), "Questions are shared with both partner accounts.");
+  } catch (error) {
+    console.error("Ask Your Person load failed:", error);
+    setStatus($("#ask-list-status"), "Couldn't load questions. Run the Stage 4 Part A SQL migration in Supabase first.");
+  } finally { loadingAskQuestions = false; }
+}
+$("#ask-question-form").addEventListener("submit", async event => {
+  event.preventDefault();
+  if (!currentUser || !coupleId || members.length !== 2) {
+    setStatus($("#ask-question-status"), "Connect both partner accounts before asking a question."); return;
+  }
+  const question = $("#ask-question-input").value.trim();
+  if (!question || question.length > 500) return;
+  const button = $("#ask-question-submit"); button.disabled = true;
+  setStatus($("#ask-question-status"), "Saving your question…");
+  try {
+    const { error } = await supabase.from("couple_questions").insert({ couple_id: coupleId, asker_id: currentUser.id, question });
+    if (error) throw error;
+    $("#ask-question-input").value = "";
+    setStatus($("#ask-question-status"), "Your question is posted for both of you ♡");
+    await loadAskQuestions();
+  } catch (error) {
+    console.error("Question create failed:", error);
+    setStatus($("#ask-question-status"), "Couldn't post your question. Confirm the Stage 4 SQL migration has been run.");
+  } finally { button.disabled = false; }
+});
+$("#ask-question-refresh").addEventListener("click", () => loadAskQuestions());
+
+// Stage 4 Part B: private drafts and shared sent notes.
+let editingLetterId = null;
+let loadingLetters = false;
+function resetLetterComposer() {
+  editingLetterId = null;
+  $("#letter-title").value = "";
+  $("#letter-body").value = "";
+  $("#letter-send").textContent = "Send with love ♡";
+  $("#letter-save-draft").textContent = "Save draft";
+}
+function letterCard(note) {
+  const card = el("article", "letter-card");
+  const meta = el("div", "ask-question-meta");
+  meta.append(el("span", "ask-question-author", note.status === "draft" ? "Your private draft" : (note.sender_id === currentUser?.id ? "You sent this ♡" : "A letter for you ♡")));
+  meta.append(el("span", "timestamp", formatDate(note.sent_at || note.updated_at || note.created_at)));
+  card.append(meta);
+  if (note.title) card.append(el("h3", "letter-card-title", note.title));
+  const body = el("p", "letter-card-body", note.body); card.append(body);
+  if (note.status === "draft" && note.sender_id === currentUser?.id) {
+    const actions = el("div", "letter-card-actions");
+    const edit = el("button", "secondary", "Edit draft"); edit.type = "button";
+    edit.addEventListener("click", () => {
+      editingLetterId = note.id; $("#letter-title").value = note.title || ""; $("#letter-body").value = note.body;
+      $("#letter-send").textContent = "Send this letter ♡"; $("#letter-save-draft").textContent = "Update draft";
+      setStatus($("#letter-compose-status"), "Draft loaded. You can edit it or send it when ready."); window.scrollTo({top:0,behavior:"smooth"});
+    });
+    const send = el("button", "primary", "Send ♡"); send.type = "button";
+    send.addEventListener("click", async () => { await saveLetter("sent", note.id, send); });
+    actions.append(edit, send); card.append(actions);
+    card.append(el("p", "ask-locked-label", "Only you can see this until you send it."));
+  } else if (note.status === "sent") {
+    card.append(el("span", "ask-locked-label", `Sent ${formatDate(note.sent_at)} · shared with your person`));
+  }
+  return card;
+}
+async function loadLetters() {
+  if (!currentUser || !coupleId || loadingLetters) return;
+  loadingLetters = true; const list = $("#letter-list");
+  try {
+    const {data,error} = await supabase.from("couple_letters").select("id,couple_id,sender_id,recipient_id,title,body,status,created_at,updated_at,sent_at").eq("couple_id",coupleId).order("created_at",{ascending:false}).limit(100);
+    if(error) throw error; clear(list);
+    if(!data?.length){list.append(el("p","muted small","No notes yet. Write the first little letter. ♡")); return;}
+    data.forEach(note=>list.append(letterCard(note)));
+    setStatus($("#letter-list-status"), "Your private drafts and shared sent letters are up to date.");
+  } catch(error) { console.error("Notes & Letters load failed:",error); setStatus($("#letter-list-status"),"Couldn't load notes. Run the Stage 4 Part B SQL migration in Supabase first."); }
+  finally { loadingLetters=false; }
+}
+async function saveLetter(status, existingId=null, actionButton=null) {
+  if(!currentUser || !coupleId || members.length!==2){setStatus($("#letter-compose-status"),"Connect both partner accounts before saving or sending a letter.");return;}
+  const title=$("#letter-title").value.trim(); const body=$("#letter-body").value.trim();
+  if(!body || body.length>5000 || title.length>100){setStatus($("#letter-compose-status"),"Please enter a message (up to 5,000 characters). The title can be up to 100 characters.");return;}
+  const partner=members.find(m=>m.user_id!==currentUser.id);
+  if(!partner){setStatus($("#letter-compose-status"),"Couldn't find your linked partner account.");return;}
+  const button=actionButton || (status==="sent" ? $("#letter-send") : $("#letter-save-draft")); button.disabled=true;
+  setStatus($("#letter-compose-status"),status==="sent"?"Sending your letter…":"Saving your draft…");
+  try {
+    const now=new Date().toISOString(); const payload={title:title||null,body,status,recipient_id:partner.user_id,updated_at:now,...(status==="sent"?{sent_at:now}:{})};
+    let error;
+    if(existingId || editingLetterId){const id=existingId||editingLetterId; ({error}=await supabase.from("couple_letters").update(payload).eq("id",id).eq("sender_id",currentUser.id).eq("status","draft"));}
+    else {({error}=await supabase.from("couple_letters").insert({couple_id:coupleId,sender_id:currentUser.id,...payload}));}
+    if(error) throw error;
+    setStatus($("#letter-compose-status"),status==="sent"?"Your letter has been sent with love. You can both read it now ♡":"Draft saved — only you can see it for now.");
+    resetLetterComposer(); await loadLetters();
+  } catch(error){console.error("Notes & Letters save failed:",error);setStatus($("#letter-compose-status"),"Couldn't save this note. Confirm the Stage 4 Part B SQL migration ran successfully.");}
+  finally {button.disabled=false;}
+}
+$("#letter-form").addEventListener("submit", async event=>{event.preventDefault(); await saveLetter("sent");});
+$("#letter-save-draft").addEventListener("click", async ()=>{await saveLetter("draft");});
+$("#letter-refresh").addEventListener("click",loadLetters);
+
+// Sidebar navigation and mobile drawer.
+function navigate(page) {
+  document.querySelectorAll(".app-page").forEach(section => {
+    const active = section.id === `page-${page}`;
+    section.hidden = !active; section.classList.toggle("active-page", active);
+  });
+  document.querySelectorAll(".nav-item[data-page]").forEach(button => button.classList.toggle("active", button.dataset.page === page));
+  document.title = `${document.querySelector(`#page-${page}`)?.dataset.title || "Fuzzy World"} · Fuzzy World ♡`;
+  closeMobileMenu();
+  if (page === "moods") { refreshMoods(); renderMoodCalendar(); renderMoodDayDetail(selectedMoodDate); }
+  if (page === "questions" && currentUser && coupleId) loadQuestionDay(istDateKey(), true);
+  if (page === "ask" && currentUser && coupleId) loadAskQuestions();
+  if (page === "letters" && currentUser && coupleId) loadLetters();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+document.querySelectorAll(".nav-item[data-page]").forEach(button => button.addEventListener("click", () => navigate(button.dataset.page)));
+const sidebar = $("#sidebar");
+const mainContent = $(".main-content");
+$("#sidebar-collapse").addEventListener("click", () => {
+  sidebar.classList.toggle("collapsed"); mainContent.classList.toggle("sidebar-is-collapsed");
+});
+$("#mobile-menu").addEventListener("click", () => {
+  sidebar.classList.add("mobile-open"); $("#mobile-backdrop").hidden = false; $("#mobile-backdrop").classList.add("visible");
+});
+function closeMobileMenu() {
+  sidebar.classList.remove("mobile-open"); $("#mobile-backdrop").hidden = true; $("#mobile-backdrop").classList.remove("visible");
+}
+$("#mobile-backdrop").addEventListener("click", closeMobileMenu);
+
+// Relationship counter and the free, recurring special-date calendar.
+function updateRelationshipCounter() {
+  const start = new Date(2023, 6, 21);
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const elapsed = Math.max(0, Math.floor((today - start) / 86400000));
+  const years = today.getFullYear() - start.getFullYear() - ((today.getMonth() < start.getMonth() || (today.getMonth() === start.getMonth() && today.getDate() < start.getDate())) ? 1 : 0);
+  const lastAnniversary = new Date(start.getFullYear() + years, start.getMonth(), start.getDate());
+  const daysSinceAnniversary = Math.floor((today - lastAnniversary) / 86400000);
+  $("#relationship-count").textContent = `${elapsed.toLocaleString("en-IN")} days together`;
+  $("#relationship-subtitle").textContent = `${years} ${years === 1 ? "year" : "years"} and ${daysSinceAnniversary} days of us — and counting. ♡`;
+  $("#today-label").textContent = new Intl.DateTimeFormat("en-IN", { weekday: "short", day: "numeric", month: "short" }).format(today);
+}
+function eventsForDate(date) {
+  const events = specialDates.filter(event => event.month === date.getMonth() && event.day === date.getDate()).map(event => ({ ...event }));
+  if (date.getMonth() === 6 && date.getDate() === 21) {
+    const years = date.getFullYear() - 2023;
+    const anniversary = events.find(event => event.kind === "anniversary");
+    if (anniversary) anniversary.title = `${years}${years === 1 ? "st" : years === 2 ? "nd" : years === 3 ? "rd" : "th"} Relationship Anniversary`;
+  }
+  return events;
+}
+function renderSelectedDateEvents(date) {
+  const box = $("#selected-date-events"); clear(box);
+  const events = eventsForDate(date);
+  const heading = el("p", "selected-date-heading", new Intl.DateTimeFormat("en-IN", { dateStyle: "full" }).format(date));
+  box.append(heading);
+  if (!events.length) { box.append(el("p", "muted small", "No special date saved for this day — a lovely day anyway. ♡")); return; }
+  for (const event of events) {
+    const row = el("div", "event-line"); row.append(el("span", "event-emoji", event.emoji), el("span", "", event.title)); box.append(row);
+  }
+}
+function renderCalendar() {
+  const year = calendarCursor.getFullYear(); const month = calendarCursor.getMonth();
+  $("#calendar-month").textContent = new Intl.DateTimeFormat("en-IN", { month: "long", year: "numeric" }).format(calendarCursor);
+  const grid = $("#calendar-days"); clear(grid);
+  const first = new Date(year, month, 1);
+  const mondayOffset = (first.getDay() + 6) % 7;
+  const start = new Date(year, month, 1 - mondayOffset);
+  for (let i = 0; i < 42; i++) {
+    const date = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+    const events = eventsForDate(date);
+    const button = el("button", "calendar-day", String(date.getDate()));
+    if (date.getMonth() !== month) button.classList.add("outside");
+    if (sameDay(date, new Date())) button.classList.add("today");
+    if (events.length) button.classList.add("has-event");
+    if (sameDay(date, selectedCalendarDate)) button.classList.add("selected");
+    button.setAttribute("aria-label", `${new Intl.DateTimeFormat("en-IN", { dateStyle: "full" }).format(date)}${events.length ? `: ${events.map(event => event.title).join(", ")}` : ""}`);
+    button.addEventListener("click", () => { selectedCalendarDate = date; if (date.getMonth() !== calendarCursor.getMonth()) calendarCursor = new Date(date.getFullYear(), date.getMonth(), 1); renderCalendar(); renderSelectedDateEvents(selectedCalendarDate); });
+    grid.append(button);
+  }
+  const legend = $("#calendar-legend"); clear(legend);
+  [["💗", "Our dates"], ["🎂", "Birthdays"], ["❤️", "Love days"]].forEach(([emoji, label]) => {
+    const span = el("span", "", `${emoji} ${label}`); legend.append(span);
+  });
+  renderSelectedDateEvents(selectedCalendarDate);
+}
+$("#calendar-prev").addEventListener("click", () => { calendarCursor = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth() - 1, 1); renderCalendar(); });
+$("#calendar-next").addEventListener("click", () => { calendarCursor = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth() + 1, 1); renderCalendar(); });
+updateRelationshipCounter(); renderCalendar(); renderMoodCalendar(); renderMoodDayDetail(selectedMoodDate);
+
+supabase.auth.onAuthStateChange((event, session) => {
+  if (event === "SIGNED_OUT" || !session) { showLoggedOut(); return; }
+  if (["SIGNED_IN", "INITIAL_SESSION", "TOKEN_REFRESHED", "USER_UPDATED"].includes(event)) setTimeout(() => handleSession(session), 0);
+});
+const { data: { session } } = await supabase.auth.getSession();
+if (session) await handleSession(session); else showLoggedOut();
+
+
+// Stage 5 · shared games. Uses the existing authenticated coupleId/currentUser/supabase session.
+const gameEls = { ttt: document.querySelector('#game-ttt'), memory: document.querySelector('#game-memory'), wyr: document.querySelector('#game-wyr'), guess: document.querySelector('#game-guess') };
+let activeGame = 'ttt';
+let gameCache = {};
+let gameChannel = null;
+const wyrQuestions = [
+ ['Would you rather have a sunset beach date or a cozy movie night?', 'Sunset beach date 🌅', 'Cozy movie night 🍿'],
+ ['Would you rather relive our first meeting or peek at our future together?', 'Relive our first meeting 💗', 'Peek at our future ✨'],
+ ['Would you rather get a handwritten letter or a surprise voice note?', 'Handwritten letter 💌', 'Surprise voice note 🎧'],
+ ['Would you rather travel together to the mountains or the sea?', 'Mountains 🏔️', 'The sea 🌊'],
+ ['Would you rather have a long hug or a long late-night conversation?', 'A long hug 🫂', 'A late-night conversation 🌙'],
+ ['Would you rather cook together or order your favourite food?', 'Cook together 🍝', 'Order our favourite food 🍕']
+];
+const memorySymbols = ['💗','🌷','🧸','🌙','🍓','🦋'];
+const gameDefault = {
+ ttt: () => ({board:Array(9).fill(''), turn: currentUser?.id || '', winner:null, scores:{X:0,O:0,draw:0}, round:1}),
+ memory: () => ({cards:shuffleGame([...memorySymbols,...memorySymbols]).map((symbol,i)=>({id:i,symbol,matched:false})), opened:[], turn:currentUser?.id||'', scores:{}, moves:0, finished:false}),
+ wyr: () => ({index:0, picks:{}, history:[]}),
+ guess: () => ({question:null})
+};
+function shuffleGame(arr){ for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr; }
+function escapeGame(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function gamePeople(){return members||[];}
+function gameName(id){if(id===currentUser?.id)return 'You'; const person=gamePeople().find(m=>m.user_id===id);return person?.display_name||person?.name||'Your person';}
+function showGame(key){activeGame=key;document.querySelectorAll('.game-tile').forEach(b=>b.classList.toggle('selected',b.dataset.game===key));Object.entries(gameEls).forEach(([k,e])=>e.hidden=k!==key);if(currentUser&&coupleId)loadGame(key);}
+document.querySelectorAll('.game-tile').forEach(b=>b.addEventListener('click',()=>showGame(b.dataset.game)));
+async function loadGame(key){if(!currentUser||!coupleId)return;const expectedCouple=coupleId;try{const {data,error}=await supabase.from('couple_games_state').select('state,updated_by,updated_at').eq('couple_id',expectedCouple).eq('game_key',key).maybeSingle();if(error)throw error;if(coupleId!==expectedCouple)return;gameCache[key]=data?.state||gameDefault[key]();renderGame(key);}catch(e){console.error('Game load failed',e);const status=document.querySelector(key==='ttt'?'#ttt-status':key==='memory'?'#memory-status':key==='wyr'?'#wyr-status':'#guess-status');if(status)status.textContent='Games need the Stage 5 SQL setup in Supabase before shared play can work.';}}
+async function saveGame(key,state){if(!currentUser||!coupleId)return;const snapshotCouple=coupleId;gameCache[key]=state;renderGame(key);try{const {error}=await supabase.from('couple_games_state').upsert({couple_id:snapshotCouple,game_key:key,state,updated_by:currentUser.id,updated_at:new Date().toISOString()},{onConflict:'couple_id,game_key'});if(error)throw error;}catch(e){console.error('Game save failed',e);const status=document.querySelector(key==='ttt'?'#ttt-status':key==='memory'?'#memory-status':key==='wyr'?'#wyr-status':'#guess-status');if(status)status.textContent='Could not sync. Run the Stage 5 SQL and try again.';}}
+function renderGame(key){const s=gameCache[key];if(!s)return;
+ if(key==='ttt'){const board=document.querySelector('#ttt-board');board.replaceChildren();s.board.forEach((v,i)=>{const b=document.createElement('button');b.type='button';b.className='ttt-cell';b.textContent=v==='X'?'❌':v==='O'?'⭕':'';b.setAttribute('aria-label',`Cell ${i+1}${v?', '+v:''}`);b.disabled=!!s.winner||!!v||s.turn!==currentUser?.id;b.addEventListener('click',()=>playTTT(i));board.append(b);});const winner=s.winner;document.querySelector('#ttt-status').textContent=winner?(winner==='draw'?'It’s a draw! Give each other a tiny high-five ♡':`${gameName(winner)} won this round! ♡`):`Your turn: ${gameName(s.turn)} · ${s.turn===currentUser?.id?'tap a square':'waiting for your person…'}`;document.querySelector('#ttt-score').textContent=`❌ ${s.scores?.X||0} · ⭕ ${s.scores?.O||0} · Draws ${s.scores?.draw||0}`;}
+ if(key==='memory'){const board=document.querySelector('#memory-board');board.replaceChildren();(s.cards||[]).forEach((c,i)=>{const b=document.createElement('button');b.type='button';b.className='memory-card'+(c.matched?' matched':'');const isOpen=(s.opened||[]).includes(i);b.textContent=c.matched||isOpen?c.symbol:'♡';b.disabled=c.matched||isOpen||s.opened?.length>=2||s.finished||s.turn!==currentUser?.id;b.setAttribute('aria-label',c.matched||isOpen?c.symbol:'Hidden card');b.addEventListener('click',()=>playMemory(i));board.append(b);});document.querySelector('#memory-status').textContent=s.finished?'All pairs found! You two are a perfect match 💗':`Turn: ${gameName(s.turn)}${s.turn===currentUser?.id?' — find a pair!':' — waiting for your person'}`;document.querySelector('#memory-score').textContent=gamePeople().map((m,i)=>`${gameName(m.user_id)}: ${s.scores?.[m.user_id]||0}`).join(' · ')||`Pairs found: ${(s.cards||[]).filter(c=>c.matched).length/2}`;}
+ if(key==='wyr'){const q=wyrQuestions[s.index%wyrQuestions.length];document.querySelector('#wyr-question').textContent=q[0];const box=document.querySelector('#wyr-options');box.replaceChildren();[q[1],q[2]].forEach((label,i)=>{const b=document.createElement('button');b.type='button';b.className='wyr-choice'+(s.picks?.[currentUser.id]===i?' chosen':'');b.textContent=label;b.disabled=s.picks?.[currentUser.id]!==undefined||Object.keys(s.picks||{}).length>=2;b.addEventListener('click',()=>{const n=structuredClone(gameCache.wyr||gameDefault.wyr());if(Object.keys(n.picks||{}).length>=2||n.picks?.[currentUser.id]!==undefined)return;n.picks={...(n.picks||{}),[currentUser.id]:i};saveGame('wyr',n);});box.append(b);});const picks=Object.keys(s.picks||{});const both=picks.length>=2;document.querySelector('#wyr-status').textContent=both?'Both answers are in! Reveal your choices below ♡':picks.length?'Your answer is saved. Waiting for your person…':'Choose the option that feels most like you.';document.querySelector('#wyr-reveal').textContent=both?gamePeople().map(m=>`${gameName(m.user_id)}: ${s.picks[m.user_id]===0?q[1]:q[2]}`).join(' · '):'';document.querySelector('#wyr-next').disabled=!both;const hist=document.querySelector('#wyr-history');if(hist)hist.innerHTML=(s.history||[]).length?'<h3>Our answers history ♡</h3>'+[...(s.history||[])].reverse().map(h=>`<article class="game-history-item"><strong>${escapeGame(h.question)}</strong><p>${escapeGame(h.answers||'')}</p></article>`).join(''):'<p class="muted small">Your previous answers will appear here.</p>';}
+ if(key==='guess'){const box=document.querySelector('#guess-live');box.replaceChildren();const q=s.question;const hist=document.querySelector('#guess-history');if(hist)hist.innerHTML=(s.history||[]).length?'<h3>Our guessing history ♡</h3>'+[...(s.history||[])].reverse().map(h=>`<article class="game-history-item"><strong>${escapeGame(h.text)}</strong><p>${escapeGame(h.result)}</p></article>`).join(''):'<p class="muted small">Completed rounds will appear here.</p>';if(!q){box.textContent='No question yet — one of you can create the first one above. ♡';document.querySelector('#guess-create').hidden=false;return;}document.querySelector('#guess-create').hidden=true;const title=document.createElement('h3');title.textContent=q.text;box.append(title);const meta=document.createElement('p');meta.className='muted small';meta.textContent=`Question by ${gameName(q.author)}`;box.append(meta);if(q.author!==currentUser.id&&!q.guess){[q.a,q.b].forEach((opt,i)=>{const b=document.createElement('button');b.type='button';b.className='guess-option';b.textContent=`${i===0?'A':'B'}. ${opt}`;b.addEventListener('click',()=>submitGuess(i));box.append(b);});}else if(q.author===currentUser.id&&!q.guess){const p=document.createElement('p');p.textContent='Your secret answer is hidden from your person. Waiting for their guess…';box.append(p);}else{const p=document.createElement('p');p.textContent=`${gameName(q.guess.user)} guessed: ${q.guess.choice===0?q.a:q.b}. ${q.guess.correct?'Correct! You know each other so well 💗':`Not quite! The answer was ${q.guess.correctAnswer===0?q.a:q.b}.`}`;box.append(p);const p2=document.createElement('p');p2.className='muted small';p2.textContent='Start another round whenever you’re ready.';box.append(p2);document.querySelector('#guess-create').hidden=false;}}
+}
+function tttWinner(board){for(const [a,b,c] of [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]])if(board[a]&&board[a]===board[b]&&board[a]===board[c])return board[a];return board.every(Boolean)?'draw':null;}
+async function playTTT(i){const s=structuredClone(gameCache.ttt||gameDefault.ttt());if(s.winner||s.board[i]||s.turn!==currentUser?.id)return;const symbol=s.turn===currentUser?.id?(s.nextSymbol||'X'):'O';s.board[i]=symbol;const win=tttWinner(s.board);s.winner=win;if(win){s.scores=s.scores||{X:0,O:0,draw:0};s.scores[win]=(s.scores[win]||0)+1;}else{s.turn=gamePeople().find(m=>m.user_id!==currentUser.id)?.user_id||currentUser.id;s.nextSymbol=symbol==='X'?'O':'X';}await saveGame('ttt',s);}
+function newTTT(){const old=gameCache.ttt||gameDefault.ttt();const other=gamePeople().find(m=>m.user_id!==currentUser.id)?.user_id;saveGame('ttt',{board:Array(9).fill(''),turn:currentUser.id,winner:null,scores:old.scores||{X:0,O:0,draw:0},round:(old.round||1)+1,nextSymbol:'X'});}
+document.querySelector('#ttt-reset').addEventListener('click',newTTT);
+async function playMemory(i){const s=structuredClone(gameCache.memory||gameDefault.memory());if(s.turn!==currentUser.id||s.opened.length>=2||s.cards[i].matched||s.opened.includes(i))return;s.opened.push(i);s.moves=(s.moves||0)+1;if(s.opened.length===2){const [a,b]=s.opened;if(s.cards[a].symbol===s.cards[b].symbol){s.cards[a].matched=s.cards[b].matched=true;s.scores=s.scores||{};s.scores[currentUser.id]=(s.scores[currentUser.id]||0)+1;s.opened=[];s.finished=s.cards.every(c=>c.matched);}else{s.turn=gamePeople().find(m=>m.user_id!==currentUser.id)?.user_id||currentUser.id;}}await saveGame('memory',s);if(s.opened.length===2&&s.cards[s.opened[0]].symbol!==s.cards[s.opened[1]].symbol){setTimeout(async()=>{const latest=structuredClone(gameCache.memory);latest.opened=[];await saveGame('memory',latest);},1300);}}
+document.querySelector('#memory-reset').addEventListener('click',()=>saveGame('memory',{cards:shuffleGame([...memorySymbols,...memorySymbols]).map((symbol,i)=>({id:i,symbol,matched:false})),opened:[],turn:currentUser.id,scores:{},moves:0,finished:false}));
+document.querySelector('#wyr-next').addEventListener('click',()=>{const s=structuredClone(gameCache.wyr||gameDefault.wyr());if(Object.keys(s.picks||{}).length<2)return;const q=wyrQuestions[s.index%wyrQuestions.length];const answers=gamePeople().map(m=>`${gameName(m.user_id)}: ${s.picks[m.user_id]===0?q[1]:q[2]}`).join(' · ');s.history=[...(s.history||[]),{question:q[0],answers, index:s.index, savedAt:new Date().toISOString()}];s.index=(s.index+1)%wyrQuestions.length;s.picks={};saveGame('wyr',s);});
+document.querySelector('#guess-create').addEventListener('submit',async e=>{e.preventDefault();const s=structuredClone(gameCache.guess||gameDefault.guess());const questionId=crypto.randomUUID();const correct=Number(document.querySelector('#guess-correct').value);s.question={id:questionId,text:document.querySelector('#guess-question').value.trim(),a:document.querySelector('#guess-a').value.trim(),b:document.querySelector('#guess-b').value.trim(),author:currentUser.id,guess:null};document.querySelector('#guess-status').textContent='Sharing your question…';await saveGame('guess',s);const {error}=await supabase.from('couple_guess_secrets').insert({couple_id:coupleId,question_id:questionId,author_id:currentUser.id,correct_option:correct});if(error){console.error('Could not save private answer',error);document.querySelector('#guess-status').textContent='Question saved, but private answer setup failed. Run the Stage 5 improvements SQL.';return;}document.querySelector('#guess-create').reset();document.querySelector('#guess-status').textContent='Question shared! Your answer stays private until your person guesses ♡';});
+async function submitGuess(choice){const s=structuredClone(gameCache.guess||gameDefault.guess());const q=s.question;if(!q||q.author===currentUser.id||q.guess)return;const {data,error}=await supabase.rpc('submit_couple_guess',{p_couple_id:coupleId,p_question_id:q.id,p_choice:choice});if(error){console.error('Guess submit failed',error);document.querySelector('#guess-status').textContent='Could not submit the guess. Run the Stage 5 improvements SQL.';return;}if(data?.state){gameCache.guess=data.state;renderGame('guess');}}
+document.querySelector('#guess-clear').addEventListener('click',()=>{const s=structuredClone(gameCache.guess||gameDefault.guess());if(s.question?.guess){const q=s.question;s.history=[...(s.history||[]),{text:q.text,result:`${gameName(q.guess.user)} guessed ${q.guess.choice===0?q.a:q.b}; ${q.guess.correct?'correct':'answer was '+(q.guess.correctAnswer===0?q.a:q.b)}`,savedAt:new Date().toISOString()}];}document.querySelector('#guess-create').hidden=false;saveGame('guess',{question:null,history:s.history||[]});});
+function subscribeGames(id){if(gameChannel)supabase.removeChannel(gameChannel);gameChannel=supabase.channel(`games-${id}`).on('postgres_changes',{event:'*',schema:'public',table:'couple_games_state',filter:`couple_id=eq.${id}`},payload=>{const row=payload.new;if(row?.game_key){gameCache[row.game_key]=row.state;renderGame(row.game_key);}}).subscribe();}
+const originalHandleSession = handleSession;
+handleSession = async function(session){await originalHandleSession(session);if(currentUser&&coupleId){subscribeGames(coupleId);if(activeGame)loadGame(activeGame);}};
+// Ensure the games page loads the selected shared game when opened.
+const originalNavigateForGames = navigate;
+navigate = function(page){originalNavigateForGames(page);if(page==='games'&&currentUser&&coupleId)loadGame(activeGame);};
+
+
+// Fuzzy World premium features: Two Moons, Our Constellation, The Us Algorithm.
+
+const fwEsc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fwMoodNames = {1:'Very low',2:'Heavy-hearted',3:'A little low',4:'Quiet',5:'In the middle',6:'Okay',7:'Good',8:'Happy',9:'Glowing',10:'On top of the world'};
+const fwLatest = rows => { const map=new Map(); for(const r of (rows||[]).slice().sort((a,b)=>new Date(b.created_at)-new Date(a.created_at))) if(!map.has(r.user_id)) map.set(r.user_id,r); return map; };
+const fwPerson = id => id===currentUser?.id?'You':(typeof getPersonName==='function'?getPersonName(id):'Your person');
+const fwTime = date => {if(!date)return 'No check-in yet';const d=new Date(date);return 'Last check-in · '+d.toLocaleDateString('en-IN',{day:'numeric',month:'short'})+' · '+d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});};
+function fwRenderMoons(){if(!currentUser||!coupleId)return;const latest=fwLatest(moodRowsCache);const you=latest.get(currentUser.id);const other=members.find(m=>m.user_id!==currentUser.id);const partner=other?latest.get(other.user_id):null;const put=(id,text)=>{const n=document.getElementById(id);if(n)n.textContent=text;};put('fw-you-mood',you?`${you.score}/10 · ${fwMoodNames[you.score]||'Checked in'}`:'Waiting for your check-in');put('fw-you-time',you?fwTime(you.created_at):'Your moon is resting');put('fw-partner-mood',partner?`${partner.score}/10 · ${fwMoodNames[partner.score]||'Checked in'}`:'Waiting for their check-in');put('fw-partner-time',partner?fwTime(partner.created_at):'Their moon is resting');const y=document.getElementById('fw-moon-you'),p=document.getElementById('fw-moon-partner');if(y)y.style.filter=you?'brightness(1.08)':'saturate(.55)';if(p)p.style.filter=partner?'brightness(1.08)':'saturate(.55)';let note='Your shared sky is waiting for its first little signals.';if(you&&partner){const diff=Math.abs(you.score-partner.score);note=diff<=1?'Your check-ins are close today. Maybe share a small moment of calm together.':(you.score<5||partner.score<5)?'One of your moons may be having a heavier day. A gentle check-in or a little space can both be caring choices.':'You may be experiencing the day differently — that is okay. Curiosity is better than assumptions.';}else if(you||partner)note='One moon has checked in. The other can join whenever they feel ready.';put('fw-moon-note',note);}
+function fwStars(){if(!currentUser||!coupleId)return;const rows=(moodRowsCache||[]).slice().sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));const events=[];events.push({title:'The beginning of your universe',detail:'Your relationship began on 21 July 2023.',date:'21 Jul 2023',kind:'milestone'});events.push({title:'Nisbat',detail:'A special day in your story.',date:'17 Jul',kind:'milestone'});events.push({title:'Barne',detail:'Another date that belongs to your world.',date:'25 Jan',kind:'milestone'});if(rows.length)rows.forEach((r,i)=>events.push({title:`A little check-in · ${r.score}/10`,detail:`${fwPerson(r.user_id)} shared a mood: ${fwMoodNames[r.score]||'Mood check-in'}.`,date:fwTime(r.created_at),kind:'mood'}));else events.push({title:'Your first shared light',detail:'Share a mood in Mood World to create the first activity star.',date:'Waiting',kind:'start'});const orbit=document.getElementById('fw-orbit');if(!orbit)return;orbit.innerHTML='';const total=Math.min(events.length,36);for(let i=0;i<total;i++){const ev=events[i];const b=document.createElement('button');b.className='fw-star';b.type='button';b.textContent=i<3?'✦':(i%4===0?'✧':'·');const angle=(i*2.3999632297);const radius=10+((i*37)%36);const x=50+Math.cos(angle)*radius;const y=50+Math.sin(angle)*radius*.75;b.style.left=`${Math.max(7,Math.min(93,x))}%`;b.style.top=`${Math.max(9,Math.min(91,y))}%`;b.style.animationDelay=`${(i%7)*.24}s`;b.setAttribute('aria-label',ev.title);b.addEventListener('click',()=>{const info=document.getElementById('fw-star-info');info.innerHTML=`<strong>${fwEsc(ev.title)}</strong><p>${fwEsc(ev.detail)}</p><span class="fw-small">${fwEsc(ev.date)}</span>`;});orbit.append(b);}const count=document.getElementById('fw-star-count');if(count)count.textContent=`${events.length} little lights in your sky`;const chip=document.getElementById('fw-streak-chip');if(chip)chip.textContent=`♡ ${rows.length} check-in${rows.length===1?'':'s'} shared`;const info=document.getElementById('fw-star-info');if(info)info.innerHTML=`<strong>${fwEsc(events[0].title)}</strong><p>${fwEsc(events[0].detail)}</p><span class="fw-small">${fwEsc(events[0].date)}</span>`;}
+function fwAlgorithm(){if(!currentUser||!coupleId)return;const latest=fwLatest(moodRowsCache);const yours=latest.get(currentUser.id);const other=members.find(m=>m.user_id!==currentUser.id);const theirs=other?latest.get(other.user_id):null;const rows=moodRowsCache||[];const avg=rows.length?rows.reduce((s,r)=>s+Number(r.score||0),0)/rows.length:0;const recent=rows.slice().sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)).slice(0,12);let title='Getting to know your rhythm',copy='As you both check in over time, this space will offer small, supportive ideas.',actionTitle='Start with one gentle question',actionCopy='Try a daily question and let the answers start a kind conversation.',actionPage='questions',meter=20,meta='Waiting for shared check-ins';let recs=[];if(!rows.length){recs=[['🌱','Plant the first star','Both of you can share a mood whenever you feel comfortable.','moods'],['💭','Try a tiny question','A light question can be easier than a big conversation.','questions'],['🎮','Play something together','Choose a no-pressure game from Games & Activities.','games']];}else{meter=Math.min(100,25+rows.length*4);meta=`Based on ${rows.length} shared mood check-in${rows.length===1?'':'s'} · simple patterns only`;if((yours&&yours.score<=4)||(theirs&&theirs.score<=4)){title='Choose softness over solutions';copy='A lower mood score can be a cue to offer kindness, not to assume what is wrong.';actionTitle='Offer a gentle check-in';actionCopy='Ask what would feel helpful today: listening, reassurance, distraction, or space.';actionPage='ask';recs=[['🤍','Offer comfort, not fixes','Try asking: “Would you like me to listen, help, distract you, or give you space?”','ask'],['🌙','Keep it low-pressure','A calm activity or a quiet check-in can be enough for today.','games'],['☾','Notice both moons','Compare only what each of you has chosen to share.','moons']];}else if(yours&&theirs&&Math.abs(yours.score-theirs.score)>=3){title='Different skies can still connect';copy='Your latest check-ins are different. That does not mean anything is wrong — it may simply be two different days.';actionTitle='Get curious, gently';actionCopy='Ask what their day has felt like without trying to match or correct it.';actionPage='questions';recs=[['🫶','Ask before advising','Try “Do you want comfort, ideas, or just company?”','ask'],['💭','Try a perspective question','Use Question Corner to learn what each of you needs today.','questions'],['✨','Choose a shared reset','Pick a short game or a small activity you both enjoy.','games']];}else if(yours&&theirs&&yours.score>=7&&theirs.score>=7){title='A little room for joy';copy='Both latest check-ins are on the brighter side. You might enjoy making a small positive moment together.';actionTitle='Turn a good mood into a moment';actionCopy='Pick a game, invent a challenge, or plan something small together.';actionPage='games';recs=[['🎮','Play a quick game','A few rounds can turn a good mood into a shared laugh.','games'],['⭐','Add a little light','Your shared constellation grows with mood check-ins.','constellation'],['🌷','Make a tiny plan','Choose one small thing to look forward to.','questions']];}else{title='Keep the connection gentle';copy='Your check-ins suggest a steady moment. You do not need a big activity to stay connected.';actionTitle='Share one small thing';actionCopy='Answer a question, play a short game, or simply check in when you have time.';actionPage='questions';recs=[['💭','Answer a daily question','Learn something new without needing a long conversation.','questions'],['✦','Explore your constellation','Celebrate the small moments already shared.','constellation'],['🎲','Let a game choose','A playful activity can make the next moment easy.','games']];}const average=rows.length?Math.round(avg*10)/10:0;const extra=rows.length?`Average shared score across available check-ins: ${average}/10. This is descriptive only, not a relationship rating.`:'No mood data yet.';const put=(id,val)=>{const e=document.getElementById(id);if(e)e.textContent=val;};put('fw-insight-title',title);put('fw-insight-copy',copy);put('fw-insight-meta',meta);put('fw-action-title',actionTitle);put('fw-action-copy',actionCopy);const meterEl=document.getElementById('fw-insight-meter');if(meterEl)meterEl.style.width=meter+'%';const btn=document.getElementById('fw-action-button');if(btn)btn.dataset.pageJump=actionPage;const box=document.getElementById('fw-recommendations');if(box)box.innerHTML=recs.map(r=>`<div class="fw-recommendation"><div class="fw-rec-icon">${r[0]}</div><div><strong>${fwEsc(r[1])}</strong><p style="margin:4px 0 8px">${fwEsc(r[2])}</p><button type="button" class="fw-button ghost" data-page-jump="${fwEsc(r[3])}">Explore ↗</button></div></div>`).join('')+`<p class="fw-footnote">${fwEsc(extra)}</p>`;}
+function fwRenderAll(){fwRenderMoons();fwStars();fwAlgorithm();}
+document.addEventListener('click',e=>{const jump=e.target.closest('[data-page-jump]');if(jump){e.preventDefault();navigate(jump.dataset.pageJump);}});
+document.getElementById('fw-refresh-algorithm')?.addEventListener('click',fwAlgorithm);
+const fwOriginalNavigate=navigate;navigate=function(page){fwOriginalNavigate(page);if(['moons','constellation','algorithm'].includes(page))fwRenderAll();};
+const fwOriginalHandleSession=handleSession;handleSession=async function(session){await fwOriginalHandleSession(session);if(currentUser&&coupleId)fwRenderAll();};
+const fwOriginalRefreshMoods=refreshMoods;refreshMoods=async function(){await fwOriginalRefreshMoods();fwRenderAll();};
+</script>
 </body>
 </html>
