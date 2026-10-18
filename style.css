@@ -466,14 +466,18 @@ body { background:radial-gradient(circle at 15% 0%,#fff0f6 0,transparent 32%),va
 .question-history-day.active,.question-history-day:hover { background:#c05f88; border-color:#c05f88; color:#fff; }
 @media(max-width:620px) { .question-intro { align-items:flex-start; padding:18px; } .question-heart { flex-basis:42px; width:42px; height:42px; font-size:25px; } .question-card { padding:13px; } .question-panel .section-heading { align-items:flex-start; } }
 
-
-/* Stage 3.1: side-by-side MCQ answer review */
-.mcq-comparison-list { display:grid; gap:13px; }
-.mcq-comparison-card { border:1px solid var(--border); border-radius:16px; padding:15px; background:linear-gradient(135deg,#fffafd,#fbf8ff); }
-.mcq-comparison-card h3 { margin:5px 0 12px; font-size:15px; line-height:1.5; }
-.mcq-comparison-answers { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
-.mcq-answer-person { min-width:0; padding:12px; border-radius:12px; background:#fff; border:1px solid var(--border); }
-.mcq-answer-person strong { display:block; color:#a6537a; font-size:12px; margin-bottom:6px; }
-.mcq-answer-person p { margin:0; font-size:13px; overflow-wrap:anywhere; line-height:1.5; }
-.mcq-match,.mcq-different { margin:10px 0 0; font-size:12px; color:#9b5276; }
-@media(max-width:520px) { .mcq-comparison-answers { grid-template-columns:1fr; } }
+/* Stage 4 Part A — Ask Your Person */
+.ask-question-card { padding: 19px 0; border-bottom: 1px solid var(--border); }
+.ask-question-card:last-child { border-bottom: 0; }
+.ask-question-meta { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px 12px; margin-bottom: 10px; }
+.ask-question-author { color: var(--accent); font-size: 12px; font-weight: 750; }
+.ask-question-text { margin: 0 0 14px; font-size: 17px; font-weight: 650; white-space: pre-wrap; overflow-wrap: anywhere; }
+.ask-answer-box { margin: 12px 0; padding: 15px; border: 1px solid var(--border); border-radius: 13px; background: #fdf7fa; }
+.ask-answer-box .eyebrow { margin-bottom: 7px; }
+.ask-answer-text { margin-bottom: 7px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.ask-answer-box .timestamp { margin-bottom: 0; }
+.ask-inline-form { margin-top: 14px; }
+.ask-inline-form label { margin-top: 8px; }
+.ask-inline-form button { margin-top: 10px; }
+.ask-edit-input, .ask-answer-input { min-height: 75px; }
+.ask-locked-label { display: inline-block; margin-top: 8px; color: var(--muted); font-size: 12px; }

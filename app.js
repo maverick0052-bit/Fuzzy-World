@@ -139,6 +139,7 @@ function showLoggedOut() {
   clear($("#mood-cards")); clear($("#mood-history")); moodRowsCache = [];
   activeQuestionDate = null; activeQuestionSetId = null; activeQuestionRows = []; activeQuestionAnswers = [];
   clear($("#my-questions-list")); clear($("#shared-answer-reveal")); clear($("#question-history-list"));
+  clear($("#ask-question-list")); setStatus($("#ask-question-status"), ""); setStatus($("#ask-list-status"), "");
   $("#mood-note").value = ""; $("#save-mood").disabled = true;
   $("#mood-picker").querySelectorAll("button").forEach(button => {
     button.classList.remove("selected"); button.setAttribute("aria-pressed", "false");
@@ -200,6 +201,7 @@ async function handleSession(session) {
     subscribeToMoods(coupleId);
     await refreshMoods();
     if (!$("#page-questions").hidden) await loadQuestionDay(istDateKey(), true);
+    if (!$("#page-ask").hidden) await loadAskQuestions();
     if (currentUser?.id === user.id) setStatus(dashboardStatus, "Your shared space is connected ♡");
   } catch (error) {
     console.error("Dashboard initialization failed:", error);
@@ -535,46 +537,11 @@ function renderQuestionDay() {
   $("#shared-answer-input").disabled = !isToday || !!ownWrittenAnswer || !written;
   $("#save-shared-answer").hidden = !isToday;
   $("#save-shared-answer").disabled = savingQuestionAnswers || !written || !!ownWrittenAnswer;
-  renderMcqComparison(mine, partnerId);
   renderSharedAnswerReveal(written, partnerId);
   if (ownWrittenAnswer) setStatus($("#shared-question-status"), "Your written answer is saved ♡");
   else setStatus($("#shared-question-status"), "");
   setStatus($("#my-question-status"), "");
 }
-function renderMcqComparison(questions, partnerId) {
-  const box = $("#mcq-comparison-list");
-  if (!box) return;
-  clear(box);
-  if (!questions.length || !partnerId) {
-    box.append(el("p", "muted", "Your shared questions will appear here once both accounts are connected."));
-    return;
-  }
-  let revealed = 0;
-  questions.forEach((question, index) => {
-    const mine = answerFor(question.id, currentUser.id);
-    const partner = answerFor(question.id, partnerId);
-    const card = el("article", "mcq-comparison-card");
-    card.append(el("p", "question-number", `Question ${index + 1}`));
-    card.append(el("h3", "", question.prompt));
-    if (mine && partner) {
-      revealed++;
-      const grid = el("div", "mcq-comparison-answers");
-      const own = el("div", "mcq-answer-person");
-      own.append(el("strong", "", "Your answer ♡"), el("p", "", mine.answer));
-      const their = el("div", "mcq-answer-person");
-      their.append(el("strong", "", `${personLabel(partnerId)}'s answer ♡`), el("p", "", partner.answer));
-      grid.append(own, their); card.append(grid);
-      if (mine.answer === partner.answer) card.append(el("p", "mcq-match", "You chose the same answer! ♡"));
-      else card.append(el("p", "mcq-different", "Different answers — something to talk about together ♡"));
-    } else {
-      const status = !mine && !partner ? "Neither of you has answered this one yet." : !mine ? "Your answer is still needed before the comparison is revealed." : "Waiting for your person to answer this question.";
-      card.append(el("p", "answer-waiting", status));
-    }
-    box.append(card);
-  });
-  if (!revealed) box.prepend(el("p", "muted small", "Comparisons unlock one question at a time after both partners answer."));
-}
-
 function renderSharedAnswerReveal(written, partnerId) {
   const box = $("#shared-answer-reveal"); clear(box);
   if (!written) return;
@@ -635,6 +602,127 @@ async function refreshQuestionHistory(showStatus = true) {
 $("#question-history-refresh").addEventListener("click", () => refreshQuestionHistory(true));
 
 
+// Stage 4 Part A: shared questions for the couple.
+let loadingAskQuestions = false;
+function askPersonLabel(userId) {
+  if (userId === currentUser?.id) return "You asked";
+  const index = members.findIndex(member => member.user_id === userId);
+  return index >= 0 ? "Your person asked" : "Your person asked";
+}
+function makeQuestionCard(question) {
+  const card = el("article", "ask-question-card");
+  const meta = el("div", "ask-question-meta");
+  meta.append(el("span", "ask-question-author", askPersonLabel(question.asker_id)));
+  meta.append(el("span", "timestamp", formatDate(question.created_at)));
+  card.append(meta);
+
+  const questionText = el("p", "ask-question-text", question.question);
+  card.append(questionText);
+  const answered = Boolean(question.answered_at && question.answer);
+  const isAsker = question.asker_id === currentUser?.id;
+  if (answered) {
+    const answerBox = el("div", "ask-answer-box");
+    answerBox.append(el("p", "eyebrow", "ANSWER · BOTH OF YOU CAN SEE THIS"));
+    answerBox.append(el("p", "ask-answer-text", question.answer));
+    answerBox.append(el("p", "timestamp", `Answered ${formatDate(question.answered_at)}`));
+    card.append(answerBox);
+    card.append(el("span", "ask-locked-label", "♡ Answered · question locked"));
+  } else if (isAsker) {
+    const editForm = el("form", "ask-inline-form");
+    const label = el("label", "", "Edit your question (until your person answers)");
+    const input = el("textarea", "ask-edit-input", question.question);
+    input.rows = 2; input.maxLength = 500; input.required = true;
+    const save = el("button", "secondary", "Save edit"); save.type = "submit";
+    editForm.append(label, input, save);
+    editForm.addEventListener("submit", async event => {
+      event.preventDefault();
+      const nextQuestion = input.value.trim();
+      if (!nextQuestion || nextQuestion.length > 500) return;
+      save.disabled = true;
+      try {
+        const { data: updated, error } = await supabase.from("couple_questions").update({ question: nextQuestion }).eq("id", question.id).eq("asker_id", currentUser.id).is("answered_at", null).select("id").maybeSingle();
+        if (error) throw error;
+        if (!updated) throw new Error("Question is already answered or unavailable.");
+        setStatus($("#ask-list-status"), "Your question was updated ♡");
+        await loadAskQuestions();
+      } catch (error) {
+        console.error("Question edit failed:", error);
+        setStatus($("#ask-list-status"), "Couldn't edit that question. It may already have been answered.");
+      } finally { save.disabled = false; }
+    });
+    card.append(editForm);
+    card.append(el("p", "ask-locked-label", "Waiting for your person to answer…"));
+  } else {
+    const answerForm = el("form", "ask-inline-form");
+    const label = el("label", "", "Your answer");
+    const input = el("textarea", "ask-answer-input", "");
+    input.rows = 3; input.maxLength = 1200; input.required = true;
+    input.placeholder = "Write your answer here…";
+    const save = el("button", "primary", "Send answer ♡"); save.type = "submit";
+    answerForm.append(label, input, save);
+    answerForm.addEventListener("submit", async event => {
+      event.preventDefault();
+      const answer = input.value.trim();
+      if (!answer || answer.length > 1200) return;
+      save.disabled = true;
+      try {
+        const { data: updated, error } = await supabase.from("couple_questions").update({ answer, answered_by: currentUser.id, answered_at: new Date().toISOString() }).eq("id", question.id).is("answered_at", null).select("id").maybeSingle();
+        if (error) throw error;
+        if (!updated) throw new Error("Question has already been answered or is unavailable.");
+        setStatus($("#ask-list-status"), "Answer saved — you can both see it now ♡");
+        await loadAskQuestions();
+      } catch (error) {
+        console.error("Question answer failed:", error);
+        setStatus($("#ask-list-status"), "Couldn't save your answer. It may already have been answered.");
+      } finally { save.disabled = false; }
+    });
+    card.append(answerForm);
+  }
+  return card;
+}
+async function loadAskQuestions() {
+  if (!currentUser || !coupleId || loadingAskQuestions) return;
+  loadingAskQuestions = true;
+  const list = $("#ask-question-list");
+  try {
+    const { data, error } = await supabase.from("couple_questions")
+      .select("id, couple_id, asker_id, question, answer, answered_by, answered_at, created_at, updated_at")
+      .eq("couple_id", coupleId).order("created_at", { ascending: false }).limit(100);
+    if (error) throw error;
+    clear(list);
+    if (!data?.length) {
+      list.append(el("p", "muted small", "No questions yet. Start with something sweet, curious, or meaningful. ♡"));
+      return;
+    }
+    data.forEach(question => list.append(makeQuestionCard(question)));
+    setStatus($("#ask-list-status"), "Questions are shared with both partner accounts.");
+  } catch (error) {
+    console.error("Ask Your Person load failed:", error);
+    setStatus($("#ask-list-status"), "Couldn't load questions. Run the Stage 4 Part A SQL migration in Supabase first.");
+  } finally { loadingAskQuestions = false; }
+}
+$("#ask-question-form").addEventListener("submit", async event => {
+  event.preventDefault();
+  if (!currentUser || !coupleId || members.length !== 2) {
+    setStatus($("#ask-question-status"), "Connect both partner accounts before asking a question."); return;
+  }
+  const question = $("#ask-question-input").value.trim();
+  if (!question || question.length > 500) return;
+  const button = $("#ask-question-submit"); button.disabled = true;
+  setStatus($("#ask-question-status"), "Saving your question…");
+  try {
+    const { error } = await supabase.from("couple_questions").insert({ couple_id: coupleId, asker_id: currentUser.id, question });
+    if (error) throw error;
+    $("#ask-question-input").value = "";
+    setStatus($("#ask-question-status"), "Your question is posted for both of you ♡");
+    await loadAskQuestions();
+  } catch (error) {
+    console.error("Question create failed:", error);
+    setStatus($("#ask-question-status"), "Couldn't post your question. Confirm the Stage 4 SQL migration has been run.");
+  } finally { button.disabled = false; }
+});
+$("#ask-question-refresh").addEventListener("click", () => loadAskQuestions());
+
 // Sidebar navigation and mobile drawer.
 function navigate(page) {
   document.querySelectorAll(".app-page").forEach(section => {
@@ -646,6 +734,7 @@ function navigate(page) {
   closeMobileMenu();
   if (page === "moods") { refreshMoods(); renderMoodCalendar(); renderMoodDayDetail(selectedMoodDate); }
   if (page === "questions" && currentUser && coupleId) loadQuestionDay(istDateKey(), true);
+  if (page === "ask" && currentUser && coupleId) loadAskQuestions();
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 document.querySelectorAll(".nav-item[data-page]").forEach(button => button.addEventListener("click", () => navigate(button.dataset.page)));
