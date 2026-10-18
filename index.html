@@ -1,112 +1,79 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#faf8f6">
+  <meta name="theme-color" content="#fff5f8">
   <title>Fuzzy World ♡</title>
   <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-  <main class="page">
-    <header class="topbar">
-      <a class="brand" href="#" aria-label="Our Little World home">
-        <span class="brand-heart">♡</span><span>our little world</span>
-      </a>
-      <span class="live-label"><span class="live-dot"></span> just us two</span>
-    </header>
+  <section id="auth-panel" class="auth-panel panel page auth-page">
+    <a class="brand auth-brand" href="#"><span class="brand-heart">♡</span><span>fuzzy world</span></a>
+    <p class="eyebrow">A LITTLE SPACE FOR US</p>
+    <h1>Closer, even<br>when we're apart.</h1>
+    <p class="muted">A private little corner for you and me.</p>
+    <div class="auth-tabs"><button id="login-tab" class="tab active" type="button">Log in</button><button id="signup-tab" class="tab" type="button">Create account</button></div>
+    <form id="auth-form">
+      <label for="email">Email address</label><input id="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+      <label for="password">Password</label><input id="password" type="password" autocomplete="current-password" minlength="8" placeholder="At least 8 characters" required>
+      <button id="auth-submit" class="primary full" type="submit">Log in</button>
+    </form>
+    <p id="auth-status" class="status" role="status" aria-live="polite"></p>
+    <p class="fine-print">A private space for the two of you. Never share your password.</p>
+  </section>
 
-    <section id="auth-panel" class="auth-panel panel">
-      <p class="eyebrow">A LITTLE SPACE FOR US</p>
-      <h1>Closer, even<br>when we're apart.</h1>
-      <p class="muted">A private little corner for you and me.</p>
-      <div class="auth-tabs">
-        <button id="login-tab" class="tab active" type="button">Log in</button>
-        <button id="signup-tab" class="tab" type="button">Create account</button>
-      </div>
-      <form id="auth-form">
-        <label for="email">Email address</label>
-        <input id="email" type="email" autocomplete="email" placeholder="you@example.com" required>
-        <label for="password">Password</label>
-        <input id="password" type="password" autocomplete="current-password" minlength="8" placeholder="At least 8 characters" required>
-        <button id="auth-submit" class="primary full" type="submit">Log in</button>
-      </form>
-      <p id="auth-status" class="status" role="status" aria-live="polite"></p>
-      <p class="fine-print">This space is for the two of you. Never share your password.</p>
-    </section>
+  <div id="app-shell" class="app-shell" hidden>
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-brand"><span class="brand-heart">♡</span><span class="sidebar-brand-text">fuzzy world</span><button id="sidebar-collapse" class="icon-button desktop-collapse" type="button" aria-label="Collapse sidebar" title="Collapse sidebar">☰</button></div>
+      <p class="sidebar-caption">OUR LITTLE UNIVERSE</p>
+      <nav id="main-nav" class="main-nav" aria-label="Main navigation">
+        <button class="nav-item active" data-page="home" type="button"><span class="nav-icon">⌂</span><span class="nav-label">Home</span></button>
+        <button class="nav-item" data-page="moods" type="button"><span class="nav-icon">♡</span><span class="nav-label">Mood World</span></button>
+        <button class="nav-item" data-page="questions" type="button"><span class="nav-icon">✎</span><span class="nav-label">Question Corner</span><span class="nav-soon">NEW</span></button>
+        <button class="nav-item" data-page="letters" type="button"><span class="nav-icon">✉</span><span class="nav-label">Notes & Letters</span></button>
+        <button class="nav-item" data-page="games" type="button"><span class="nav-icon">✿</span><span class="nav-label">Games & Activities</span></button>
+        <button class="nav-item" data-page="chat" type="button"><span class="nav-icon">☏</span><span class="nav-label">Our Chat</span></button>
+        <button class="nav-item" data-page="memories" type="button"><span class="nav-icon">▧</span><span class="nav-label">Our Memories</span></button>
+        <button class="nav-item" data-page="notifications" type="button"><span class="nav-icon">♧</span><span class="nav-label">Notifications</span></button>
+        <button class="nav-item" data-page="settings" type="button"><span class="nav-icon">⚙</span><span class="nav-label">Settings</span></button>
+      </nav>
+      <div class="sidebar-bottom"><div class="sidebar-love-note">made for two, with love <span>♥</span></div><button id="logout-button" class="nav-item logout-item" type="button"><span class="nav-icon">↪</span><span class="nav-label">Log out</span></button></div>
+    </aside>
+    <div id="mobile-backdrop" class="mobile-backdrop" hidden></div>
+    <main class="main-content">
+      <header class="mobile-topbar"><button id="mobile-menu" class="icon-button" type="button" aria-label="Open menu">☰</button><a class="brand" href="#home"><span class="brand-heart">♡</span><span>fuzzy world</span></a><span class="tiny-heart">♥</span></header>
+      <div id="dashboard-status" class="status global-status" role="status" aria-live="polite"></div>
 
-    <section id="dashboard" hidden>
-      <div class="welcome">
-        <div>
-          <p class="eyebrow">OUR SHARED SPACE</p>
-          <h1>Hi, you two <span class="accent">♡</span></h1>
-          <p class="muted">A little check-in can mean a lot.</p>
-        </div>
-        <button id="logout-button" class="secondary" type="button">Log out</button>
-      </div>
-      <p id="dashboard-status" class="status" role="status" aria-live="polite"></p>
-
-      <section class="panel mood-panel">
-        <div class="section-heading">
-          <div><p class="eyebrow">HOW ARE WE FEELING?</p><h2>Our moods</h2></div>
-          <span class="live-badge"><span class="live-dot"></span> Live</span>
-        </div>
-        <div id="mood-cards" class="mood-cards"><p class="muted">Loading your shared space…</p></div>
-        <div class="divider"></div>
-        <h3>How are you feeling today?</h3>
-        <p class="muted small">Choose a number from 1 to 10.</p>
-        <div id="mood-picker" class="mood-picker" aria-label="Choose your mood">
-          <button type="button" data-score="1" aria-label="Mood 1">1</button>
-          <button type="button" data-score="2" aria-label="Mood 2">2</button>
-          <button type="button" data-score="3" aria-label="Mood 3">3</button>
-          <button type="button" data-score="4" aria-label="Mood 4">4</button>
-          <button type="button" data-score="5" aria-label="Mood 5">5</button>
-          <button type="button" data-score="6" aria-label="Mood 6">6</button>
-          <button type="button" data-score="7" aria-label="Mood 7">7</button>
-          <button type="button" data-score="8" aria-label="Mood 8">8</button>
-          <button type="button" data-score="9" aria-label="Mood 9">9</button>
-          <button type="button" data-score="10" aria-label="Mood 10">10</button>
-        </div>
-        <p id="selected-mood" class="selected-mood">Choose whichever number feels right ♡</p>
-        <label for="mood-note">A little note (optional)</label>
-        <textarea id="mood-note" maxlength="280" rows="2" placeholder="What's on your mind?"></textarea>
-        <button id="save-mood" class="primary full" type="button" disabled>Save my mood ♡</button>
-        <p id="mood-status" class="status" role="status" aria-live="polite"></p>
+      <section id="page-home" class="app-page active-page" data-title="Home">
+        <div class="welcome"><div><p class="eyebrow">YOUR SHARED SPACE</p><h1>Our little world <span class="accent">♡</span></h1><p class="muted">Two hearts, one tiny universe.</p></div><div class="today-pill" id="today-label">Today, together</div></div>
+        <section class="panel relationship-panel"><div class="relationship-heart">♡</div><div><p class="eyebrow">SINCE 21 JULY 2023</p><h2 id="relationship-count">Counting our days…</h2><p id="relationship-subtitle" class="muted small">Every day with you is a favourite.</p></div><div class="relationship-sparkle">✧</div></section>
+        <section class="panel mood-panel"><div class="section-heading"><div><p class="eyebrow">A LITTLE CHECK-IN</p><h2>How are we feeling?</h2></div><span class="live-badge"><span class="live-dot"></span> Live</span></div><div id="mood-cards" class="mood-cards"><p class="muted">Connect to see your moods.</p></div><div class="divider"></div><h3>Your mood today</h3><p class="muted small">Choose the number that feels right.</p><div id="mood-picker" class="mood-picker" aria-label="Choose your mood"><button type="button" data-score="1" aria-label="Mood 1" aria-pressed="false">1</button>
+<button type="button" data-score="2" aria-label="Mood 2" aria-pressed="false">2</button>
+<button type="button" data-score="3" aria-label="Mood 3" aria-pressed="false">3</button>
+<button type="button" data-score="4" aria-label="Mood 4" aria-pressed="false">4</button>
+<button type="button" data-score="5" aria-label="Mood 5" aria-pressed="false">5</button>
+<button type="button" data-score="6" aria-label="Mood 6" aria-pressed="false">6</button>
+<button type="button" data-score="7" aria-label="Mood 7" aria-pressed="false">7</button>
+<button type="button" data-score="8" aria-label="Mood 8" aria-pressed="false">8</button>
+<button type="button" data-score="9" aria-label="Mood 9" aria-pressed="false">9</button>
+<button type="button" data-score="10" aria-label="Mood 10" aria-pressed="false">10</button></div><p id="selected-mood" class="selected-mood">Choose whichever number feels right ♡</p><label for="mood-note">A little note (optional)</label><textarea id="mood-note" maxlength="280" rows="2" placeholder="What's on your mind?"></textarea><button id="save-mood" class="primary full" type="button" disabled>Save my mood ♡</button><p id="mood-status" class="status" role="status" aria-live="polite"></p></section>
+        <section class="panel calendar-panel"><div class="section-heading"><div><p class="eyebrow">SAVE THE LITTLE THINGS</p><h2>Our special days</h2></div><span class="calendar-flower">✿</span></div><div class="calendar-controls"><button id="calendar-prev" class="icon-button" type="button" aria-label="Previous month">‹</button><h3 id="calendar-month">Month Year</h3><button id="calendar-next" class="icon-button" type="button" aria-label="Next month">›</button></div><div class="calendar-grid calendar-weekdays"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div><div id="calendar-days" class="calendar-grid calendar-days"></div><div id="calendar-legend" class="calendar-legend"></div><div id="selected-date-events" class="selected-date-events"><p class="muted small">Select a highlighted date to see what's special.</p></div></section>
       </section>
 
-      <section class="panel calendar-panel">
-        <p class="eyebrow">OUR DAYS, OUR LITTLE MOMENTS</p>
-        <h2>Mood calendar</h2>
-        <p class="muted small">Choose a date to look back at both of your check-ins.</p>
-        <div class="calendar-toolbar">
-          <button id="calendar-prev" class="calendar-nav" type="button" aria-label="Previous month">‹</button>
-          <h3 id="calendar-month-label" aria-live="polite">Month Year</h3>
-          <button id="calendar-next" class="calendar-nav" type="button" aria-label="Next month">›</button>
-        </div>
-        <div class="calendar-weekdays" aria-hidden="true">
-          <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
-        </div>
-        <div id="calendar-grid" class="calendar-grid" aria-label="Mood calendar"></div>
-        <div class="calendar-legend"><span class="legend-dot"></span> A mood was saved that day</div>
-        <div class="divider"></div>
-        <div class="selected-day-heading">
-          <div><p class="eyebrow">DAY DETAILS</p><h3 id="selected-day-label">Selected date</h3></div>
-          <span id="selected-day-count" class="day-count"></span>
-        </div>
-        <div id="selected-day-moods" class="day-moods">
-          <p class="muted small">Choose a day to see its moods.</p>
-        </div>
-      </section>
+      <section id="page-moods" class="app-page" data-title="Mood World" hidden><div class="page-heading"><p class="eyebrow">OUR FEELINGS, OVER TIME</p><h1>Mood World <span class="accent">♡</span></h1><p class="muted">A gentle place to check in and look back.</p></div><section class="panel"><h2>Recent mood history</h2><p class="muted small">Your latest shared mood updates, newest first.</p><div id="mood-history"><p class="muted">Your history will appear here after connecting.</p></div></section></section>
 
-      <section class="panel history-panel">
-        <p class="eyebrow">LITTLE MOMENTS, OVER TIME</p>
-        <h2>Shared mood history</h2>
-        <p class="muted small">Your recent shared mood updates, newest first. Times are shown in IST.</p>
-        <div id="mood-history"><p class="muted">Loading history…</p></div>
-      </section>
-      <footer>Made with care, for two. <span class="accent">♡</span></footer>
-    </section>
-  </main>
+      <section id="page-questions" class="app-page" data-title="Question Corner" hidden><div class="page-heading"><p class="eyebrow">A LITTLE CLOSER EVERY DAY</p><h1>Question Corner <span class="accent">♡</span></h1><p class="muted">Small questions, lovely conversations.</p></div><section class="panel feature-panel"><span class="feature-emoji">✎</span><h2>Daily question challenge</h2><p>Free mode is selected: we'll use a built-in question bank, so no paid AI API is needed.</p><div class="feature-status">Next build stage · Shared answers and reveal rules</div><p class="muted small">The shared, private answer system needs database tables and access policies before it can be safely enabled for both accounts.</p></section></section>
+
+      <section id="page-letters" class="app-page" data-title="Notes & Letters" hidden><div class="page-heading"><p class="eyebrow">WORDS TO KEEP</p><h1>Notes & Letters</h1><p class="muted">Little messages for your favourite person.</p></div><section class="panel feature-panel"><span class="feature-emoji">✉</span><h2>Love notes are coming</h2><p>Quick notes, longer letters, favourites and scheduled surprises will live here.</p><div class="feature-status">Planned for a later stage</div></section></section>
+      <section id="page-games" class="app-page" data-title="Games & Activities" hidden><div class="page-heading"><p class="eyebrow">LET'S PLAY</p><h1>Games & Activities</h1><p class="muted">A few new ways to make memories.</p></div><section class="panel feature-panel"><span class="feature-emoji">✿</span><h2>Fun for two</h2><p>Couple quizzes, Would You Rather, date ideas and a shared bucket list.</p><div class="feature-status">Planned for a later stage</div></section></section>
+      <section id="page-chat" class="app-page" data-title="Our Chat" hidden><div class="page-heading"><p class="eyebrow">JUST BETWEEN US</p><h1>Our Chat</h1><p class="muted">A private place to talk.</p></div><section class="panel feature-panel"><span class="feature-emoji">☏</span><h2>Private chat</h2><p>Messages, replies, reactions and unread counts will be built with couple-only access rules.</p><div class="feature-status">Planned for a later stage · Not active yet</div></section></section>
+      <section id="page-memories" class="app-page" data-title="Our Memories" hidden><div class="page-heading"><p class="eyebrow">OUR STORY SO FAR</p><h1>Our Memories</h1><p class="muted">Moments worth keeping.</p></div><section class="panel feature-panel"><span class="feature-emoji">▧</span><h2>A timeline of us</h2><p>Photos, captions, milestones and little “on this day” memories.</p><div class="feature-status">Planned for a later stage</div></section></section>
+      <section id="page-notifications" class="app-page" data-title="Notifications" hidden><div class="page-heading"><p class="eyebrow">LITTLE REMINDERS</p><h1>Notifications</h1><p class="muted">The important things, gently remembered.</p></div><section class="panel feature-panel"><span class="feature-emoji">♧</span><h2>Notification centre</h2><p>In-app alerts will come first. Browser push can be added later.</p><div class="feature-status">Planned for a later stage</div></section></section>
+      <section id="page-settings" class="app-page" data-title="Settings" hidden><div class="page-heading"><p class="eyebrow">MAKE IT YOURS</p><h1>Settings</h1><p class="muted">Your little world, your preferences.</p></div><section class="panel settings-panel"><h2>Our details</h2><div class="setting-row"><div><strong>Relationship started</strong><p class="muted small">21 July 2023</p></div><span>♡</span></div><div class="setting-row"><div><strong>Fattumi's birthday</strong><p class="muted small">20 January · repeats yearly</p></div><span>🎂</span></div><div class="setting-row"><div><strong>Juzzy's birthday</strong><p class="muted small">19 May · repeats yearly</p></div><span>🎂</span></div><p class="muted small">“Nisbat” (17 July) and “Barne” (25 January) are included as recurring special dates for now. You can change their labels and recurrence in a later settings stage.</p></section></section>
+      <footer class="app-footer">made with care, for two <span class="accent">♡</span></footer>
+    </main>
+  </div>
   <script type="module" src="./app.js"></script>
 </body>
 </html>
