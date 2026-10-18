@@ -199,6 +199,7 @@ async function handleSession(session) {
     const brandName = couple?.name || "fuzzy world";
     document.querySelectorAll(".sidebar-brand-text,.mobile-topbar .brand span:last-child,.auth-brand span:last-child").forEach(node => node.textContent = brandName);
     subscribeToMoods(coupleId);
+    subscribeToOpenSiteNotifications(coupleId);
     await refreshMoods();
     if (!$("#page-questions").hidden) await loadQuestionDay(istDateKey(), true);
     if (!$("#page-ask").hidden) await loadAskQuestions();
@@ -819,29 +820,7 @@ function renderTwoMoons() {
     if(row?.note){const note=document.createElement('p');note.className='moon-note';note.textContent=`“${row.note}”`;card.append(note);} details.append(card);
   });
 }
-function renderConstellation() {
-  const host=document.getElementById('constellation-list'); if(!host)return; host.replaceChildren();
-  const events=[['21 July 2023','Our story began','The day your relationship started','♡','2023-07-21'],['17 July','Nisbat','A special date in your story','✧','07-17'],['25 January','Barne','Another star in your shared sky','✦','01-25'],['20 January','Fattumi’s birthday','A day to celebrate her','🎂','01-20'],['19 May','Juzzy’s birthday','A day to celebrate you','🎂','05-19']];
-  events.forEach(([date,title,copy,icon,key])=>{const item=document.createElement('article');item.className='constellation-event';const star=document.createElement('span');star.className='event-star';star.textContent=icon;const body=document.createElement('div');const h=document.createElement('h3');h.textContent=title;const p=document.createElement('p');p.className='muted small';p.textContent=copy;const d=document.createElement('span');d.className='constellation-date';d.textContent=date;body.append(h,p,d);item.append(star,body);host.append(item);});
-}
-const usIdeas=[
- {title:'A 10-minute soft reset',copy:'Put your phones away, sit close, and each share one thing that felt heavy and one thing that felt good today.',tags:['Listen','No fixing','10 minutes'],kind:'gentle'},
- {title:'Send a tiny voice note',copy:'Tell your person one specific thing you appreciated about them recently. Keep it simple and real.',tags:['Connection','Sweet surprise','2 minutes'],kind:'gentle'},
- {title:'Build a tiny future plan',copy:'Choose one small thing to look forward to this week — a snack date, a call, a walk, or a shared episode.',tags:['Togetherness','Something to anticipate'],kind:'bright'},
- {title:'Play a little game together',copy:'Open Games & Activities and play one quick round. Keep the goal to laugh, not to win.',tags:['Play','Light-hearted','Games'],kind:'bright'},
- {title:'Make a calm shared playlist',copy:'Each add two songs: one that matches your mood and one that reminds you of the other person.',tags:['Music','Share a feeling'],kind:'gentle'},
- {title:'Celebrate the ordinary',copy:'Share one small moment from today that you wish the other person could have seen.',tags:['Daily life','Feeling close'],kind:'bright'}
-];
-let lastUsIdea=-1;
-function renderUsAlgorithm(){
- const latest=latestMoodRows(); const scores=latest.map(row=>Number(row.score)).filter(Number.isFinite); let pool=[0,1,2,3,4,5];
- if(scores.length && scores.some(score=>score<=4)) pool=[0,1,4]; else if(scores.length && scores.every(score=>score>=8)) pool=[2,3,5];
- let index=pool[Math.floor(Math.random()*pool.length)]; if(pool.length>1&&index===lastUsIdea) index=pool[(pool.indexOf(index)+1)%pool.length]; lastUsIdea=index;
- const idea=usIdeas[index]; document.getElementById('algorithm-title').textContent=idea.title; document.getElementById('algorithm-copy').textContent=idea.copy;
- const tags=document.getElementById('algorithm-tags'); tags.replaceChildren(); idea.tags.forEach(tag=>{const el=document.createElement('span');el.className='algorithm-tag';el.textContent=tag;tags.append(el);});
-}
 document.getElementById('moons-refresh')?.addEventListener('click',async()=>{await refreshMoods();renderTwoMoons();});
-document.getElementById('algorithm-refresh')?.addEventListener('click',renderUsAlgorithm);
 
 // Sidebar navigation and mobile drawer.
 function navigate(page) {
@@ -854,8 +833,6 @@ function navigate(page) {
   closeMobileMenu();
   if (page === "moods") { refreshMoods(); renderMoodCalendar(); renderMoodDayDetail(selectedMoodDate); }
   if (page === "twomoons") renderTwoMoons();
-  if (page === "constellation") renderConstellation();
-  if (page === "algorithm") renderUsAlgorithm();
   if (page === "questions" && currentUser && coupleId) loadQuestionDay(istDateKey(), true);
   if (page === "ask" && currentUser && coupleId) loadAskQuestions();
   if (page === "letters" && currentUser && coupleId) loadLetters();
@@ -993,3 +970,62 @@ handleSession = async function(session){await originalHandleSession(session);if(
 // Ensure the games page loads the selected shared game when opened.
 const originalNavigateForGames = navigate;
 navigate = function(page){originalNavigateForGames(page);if(page==='games'&&currentUser&&coupleId)loadGame(activeGame);};
+
+
+// Browser event notifications while this page is open only. No background push.
+const fwNotificationDefaults={dailyQuestion:true,askQuestion:true,newLetter:true,moodUpdate:true,gameMove:true,answerReceived:true,partnerOnline:true};
+let fwNotificationChannel=null, fwPresenceChannel=null, fwNotificationReady=false, fwPartnerOnline=false;
+function fwGetNotificationPrefs(){try{return {...fwNotificationDefaults,...JSON.parse(localStorage.getItem('fwNotificationPreferences')||'{}')}}catch{return {...fwNotificationDefaults}}}
+function fwSaveNotificationPrefs(){const p={};document.querySelectorAll('[data-notification-event]').forEach(x=>p[x.dataset.notificationEvent]=x.checked);try{localStorage.setItem('fwNotificationPreferences',JSON.stringify(p))}catch{}}
+function fwLoadNotificationPrefs(){const p=fwGetNotificationPrefs();document.querySelectorAll('[data-notification-event]').forEach(x=>{x.checked=p[x.dataset.notificationEvent]!==false;x.addEventListener('change',fwSaveNotificationPrefs)})}
+function fwNotify(k,title,body){if(!currentUser||!coupleId||!fwGetNotificationPrefs()[k]||!('Notification'in window)||Notification.permission!=='granted')return;try{new Notification(title,{body,tag:`fw-${k}-${Date.now()}`})}catch(e){console.debug('Notification unavailable',e)}}
+function subscribeToOpenSiteNotifications(id){
+ if(fwNotificationChannel)supabase.removeChannel(fwNotificationChannel);if(fwPresenceChannel)supabase.removeChannel(fwPresenceChannel);fwNotificationReady=false;
+ const partnerId=members.find(m=>m.user_id!==currentUser?.id)?.user_id;
+ fwNotificationChannel=supabase.channel(`fw-notifications-${id}-${currentUser.id}`)
+ .on('postgres_changes',{event:'INSERT',schema:'public',table:'daily_questions'},()=>{if(fwNotificationReady)fwNotify('dailyQuestion','Fuzzy World · Daily question ♡','A shared daily question is ready.')})
+ .on('postgres_changes',{event:'*',schema:'public',table:'couple_questions',filter:`couple_id=eq.${id}`},p=>{const r=p.new||{};if(!fwNotificationReady||r.asker_id===currentUser?.id)return;if(p.eventType==='INSERT')fwNotify('askQuestion','Fuzzy World · A question for you ♡','Your person asked you something.');if(p.eventType==='UPDATE'&&r.answered_at&&r.answered_by!==currentUser?.id)fwNotify('answerReceived','Fuzzy World · Answer received ♡','Your person answered a question.')})
+ .on('postgres_changes',{event:'INSERT',schema:'public',table:'couple_letters',filter:`couple_id=eq.${id}`},p=>{const r=p.new||{};if(fwNotificationReady&&r.sender_id!==currentUser?.id&&r.status!=='draft')fwNotify('newLetter','Fuzzy World · A little letter ♡','Your person sent a note or letter.')})
+ .on('postgres_changes',{event:'INSERT',schema:'public',table:'mood_updates',filter:`couple_id=eq.${id}`},p=>{if(fwNotificationReady&&p.new?.user_id!==currentUser?.id)fwNotify('moodUpdate','Fuzzy World · Mood update ♡','Your person shared a new mood.')})
+ .on('postgres_changes',{event:'*',schema:'public',table:'couple_games_state',filter:`couple_id=eq.${id}`},p=>{if(fwNotificationReady&&p.new?.updated_by&&p.new.updated_by!==currentUser?.id)fwNotify('gameMove','Fuzzy World · Game update ♡','Your person made a move in a shared game.')})
+ .subscribe(status=>{if(status==='SUBSCRIBED')setTimeout(()=>fwNotificationReady=true,1500)});
+ fwPresenceChannel=supabase.channel(`fw-presence-${id}`,{config:{presence:{key:currentUser.id}}});
+ fwPresenceChannel.on('presence',{event:'sync'},()=>{const st=fwPresenceChannel.presenceState();const online=!!partnerId&&Object.keys(st).some(k=>k===partnerId||(st[k]||[]).some(x=>x.user_id===partnerId));if(fwNotificationReady&&online&&!fwPartnerOnline)fwNotify('partnerOnline','Fuzzy World · Your person is here ♡','Your person just came online.');fwPartnerOnline=online}).subscribe(async status=>{if(status==='SUBSCRIBED')await fwPresenceChannel.track({user_id:currentUser.id,online_at:new Date().toISOString()})});
+}
+fwLoadNotificationPrefs();
+
+// Browser notifications. Permission is requested only after the user clicks the button.
+function refreshNotificationStatus() {
+  const status = document.getElementById('notification-permission-status');
+  const dot = document.getElementById('notification-dot');
+  const enable = document.getElementById('enable-notifications');
+  const test = document.getElementById('test-notification');
+  const title = document.getElementById('notification-title');
+  const desc = document.getElementById('notification-description');
+  if (!status || !dot || !enable || !test) return;
+  if (!('Notification' in window)) {
+    status.textContent = 'This browser does not support notifications.'; dot.classList.add('is-off');
+    enable.disabled = true; test.disabled = true; title.textContent = 'Notifications are not supported here.';
+    desc.textContent = 'Try an updated desktop browser such as Chrome or Edge.'; return;
+  }
+  const permission = Notification.permission;
+  status.textContent = permission === 'granted' ? 'Notifications are enabled on this device.' : permission === 'denied' ? 'Notifications are blocked by your browser.' : 'Notifications have not been enabled yet.';
+  dot.classList.toggle('is-on', permission === 'granted'); dot.classList.toggle('is-off', permission !== 'granted');
+  enable.disabled = permission === 'granted'; enable.textContent = permission === 'granted' ? 'Notifications enabled ✓' : permission === 'denied' ? 'Allow in browser settings' : 'Enable notifications ♡';
+  test.disabled = permission !== 'granted';
+  if (permission === 'denied') desc.textContent = 'Your browser previously blocked notifications. Open the site permissions beside the address bar and allow notifications, then reload.';
+  else if (permission === 'granted') desc.textContent = 'Notifications are enabled. Event alerts work only while Fuzzy World is open and connected.';
+}
+async function enableBrowserNotifications() {
+  if (!('Notification' in window)) { refreshNotificationStatus(); return; }
+  try { await Notification.requestPermission(); } catch (error) { console.error('Notification permission request failed:', error); }
+  refreshNotificationStatus();
+}
+document.getElementById('enable-notifications')?.addEventListener('click', enableBrowserNotifications);
+document.getElementById('test-notification')?.addEventListener('click', () => {
+  if (!('Notification' in window) || Notification.permission !== 'granted') { refreshNotificationStatus(); return; }
+  try { new Notification('Fuzzy World ♡', { body: 'Your open-site browser notifications are working ♡', icon: './favicon.ico' }); }
+  catch (error) { console.error('Could not show notification:', error); }
+});
+document.querySelectorAll('.nav-item[data-page="notifications"]').forEach(button => button.addEventListener('click', () => setTimeout(refreshNotificationStatus, 0)));
+refreshNotificationStatus();
