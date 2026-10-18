@@ -481,3 +481,14 @@ body { background:radial-gradient(circle at 15% 0%,#fff0f6 0,transparent 32%),va
 .ask-inline-form button { margin-top: 10px; }
 .ask-edit-input, .ask-answer-input { min-height: 75px; }
 .ask-locked-label { display: inline-block; margin-top: 8px; color: var(--muted); font-size: 12px; }
+
+
+/* Stage 4 Part B — Notes & Letters */
+#page-letters input, #page-letters textarea { width:100%; box-sizing:border-box; border:1px solid var(--border); border-radius:13px; padding:12px 14px; background:#fff; color:inherit; font:inherit; margin:7px 0 14px; }
+#page-letters textarea { resize:vertical; line-height:1.6; }
+.letter-actions,.letter-card-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:8px; }
+.letter-card { padding:18px 0; border-bottom:1px solid var(--border); }
+.letter-card:last-child { border-bottom:0; }
+.letter-card-title { color:var(--accent); font-size:17px; margin:7px 0 9px; }
+.letter-card-body { white-space:pre-wrap; overflow-wrap:anywhere; line-height:1.7; margin:0 0 12px; }
+@media(max-width:620px) { .letter-actions button,.letter-card-actions button { flex:1; } }

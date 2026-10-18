@@ -723,6 +723,76 @@ $("#ask-question-form").addEventListener("submit", async event => {
 });
 $("#ask-question-refresh").addEventListener("click", () => loadAskQuestions());
 
+// Stage 4 Part B: private drafts and shared sent notes.
+let editingLetterId = null;
+let loadingLetters = false;
+function resetLetterComposer() {
+  editingLetterId = null;
+  $("#letter-title").value = "";
+  $("#letter-body").value = "";
+  $("#letter-send").textContent = "Send with love ♡";
+  $("#letter-save-draft").textContent = "Save draft";
+}
+function letterCard(note) {
+  const card = el("article", "letter-card");
+  const meta = el("div", "ask-question-meta");
+  meta.append(el("span", "ask-question-author", note.status === "draft" ? "Your private draft" : (note.sender_id === currentUser?.id ? "You sent this ♡" : "A letter for you ♡")));
+  meta.append(el("span", "timestamp", formatDate(note.sent_at || note.updated_at || note.created_at)));
+  card.append(meta);
+  if (note.title) card.append(el("h3", "letter-card-title", note.title));
+  const body = el("p", "letter-card-body", note.body); card.append(body);
+  if (note.status === "draft" && note.sender_id === currentUser?.id) {
+    const actions = el("div", "letter-card-actions");
+    const edit = el("button", "secondary", "Edit draft"); edit.type = "button";
+    edit.addEventListener("click", () => {
+      editingLetterId = note.id; $("#letter-title").value = note.title || ""; $("#letter-body").value = note.body;
+      $("#letter-send").textContent = "Send this letter ♡"; $("#letter-save-draft").textContent = "Update draft";
+      setStatus($("#letter-compose-status"), "Draft loaded. You can edit it or send it when ready."); window.scrollTo({top:0,behavior:"smooth"});
+    });
+    const send = el("button", "primary", "Send ♡"); send.type = "button";
+    send.addEventListener("click", async () => { await saveLetter("sent", note.id, send); });
+    actions.append(edit, send); card.append(actions);
+    card.append(el("p", "ask-locked-label", "Only you can see this until you send it."));
+  } else if (note.status === "sent") {
+    card.append(el("span", "ask-locked-label", `Sent ${formatDate(note.sent_at)} · shared with your person`));
+  }
+  return card;
+}
+async function loadLetters() {
+  if (!currentUser || !coupleId || loadingLetters) return;
+  loadingLetters = true; const list = $("#letter-list");
+  try {
+    const {data,error} = await supabase.from("couple_letters").select("id,couple_id,sender_id,recipient_id,title,body,status,created_at,updated_at,sent_at").eq("couple_id",coupleId).order("created_at",{ascending:false}).limit(100);
+    if(error) throw error; clear(list);
+    if(!data?.length){list.append(el("p","muted small","No notes yet. Write the first little letter. ♡")); return;}
+    data.forEach(note=>list.append(letterCard(note)));
+    setStatus($("#letter-list-status"), "Your private drafts and shared sent letters are up to date.");
+  } catch(error) { console.error("Notes & Letters load failed:",error); setStatus($("#letter-list-status"),"Couldn't load notes. Run the Stage 4 Part B SQL migration in Supabase first."); }
+  finally { loadingLetters=false; }
+}
+async function saveLetter(status, existingId=null, actionButton=null) {
+  if(!currentUser || !coupleId || members.length!==2){setStatus($("#letter-compose-status"),"Connect both partner accounts before saving or sending a letter.");return;}
+  const title=$("#letter-title").value.trim(); const body=$("#letter-body").value.trim();
+  if(!body || body.length>5000 || title.length>100){setStatus($("#letter-compose-status"),"Please enter a message (up to 5,000 characters). The title can be up to 100 characters.");return;}
+  const partner=members.find(m=>m.user_id!==currentUser.id);
+  if(!partner){setStatus($("#letter-compose-status"),"Couldn't find your linked partner account.");return;}
+  const button=actionButton || (status==="sent" ? $("#letter-send") : $("#letter-save-draft")); button.disabled=true;
+  setStatus($("#letter-compose-status"),status==="sent"?"Sending your letter…":"Saving your draft…");
+  try {
+    const now=new Date().toISOString(); const payload={title:title||null,body,status,recipient_id:partner.user_id,updated_at:now,...(status==="sent"?{sent_at:now}:{})};
+    let error;
+    if(existingId || editingLetterId){const id=existingId||editingLetterId; ({error}=await supabase.from("couple_letters").update(payload).eq("id",id).eq("sender_id",currentUser.id).eq("status","draft"));}
+    else {({error}=await supabase.from("couple_letters").insert({couple_id:coupleId,sender_id:currentUser.id,...payload}));}
+    if(error) throw error;
+    setStatus($("#letter-compose-status"),status==="sent"?"Your letter has been sent with love. You can both read it now ♡":"Draft saved — only you can see it for now.");
+    resetLetterComposer(); await loadLetters();
+  } catch(error){console.error("Notes & Letters save failed:",error);setStatus($("#letter-compose-status"),"Couldn't save this note. Confirm the Stage 4 Part B SQL migration ran successfully.");}
+  finally {button.disabled=false;}
+}
+$("#letter-form").addEventListener("submit", async event=>{event.preventDefault(); await saveLetter("sent");});
+$("#letter-save-draft").addEventListener("click", async ()=>{await saveLetter("draft");});
+$("#letter-refresh").addEventListener("click",loadLetters);
+
 // Sidebar navigation and mobile drawer.
 function navigate(page) {
   document.querySelectorAll(".app-page").forEach(section => {
@@ -735,6 +805,7 @@ function navigate(page) {
   if (page === "moods") { refreshMoods(); renderMoodCalendar(); renderMoodDayDetail(selectedMoodDate); }
   if (page === "questions" && currentUser && coupleId) loadQuestionDay(istDateKey(), true);
   if (page === "ask" && currentUser && coupleId) loadAskQuestions();
+  if (page === "letters" && currentUser && coupleId) loadLetters();
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 document.querySelectorAll(".nav-item[data-page]").forEach(button => button.addEventListener("click", () => navigate(button.dataset.page)));
