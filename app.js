@@ -225,6 +225,7 @@ async function refreshMoods() {
   }
   if (currentUser?.id !== expectedUserId || coupleId !== expectedCoupleId) return;
   moodRowsCache = allRows; renderMoodCards(moodRowsCache); renderMoodHistory(moodRowsCache); renderMoodCalendar(); renderMoodDayDetail(selectedMoodDate);
+  if (!document.getElementById("page-twomoons")?.hidden) renderTwoMoons();
 }
 function getPersonName(userId) {
   if (userId === currentUser?.id) return "You";
@@ -793,6 +794,55 @@ $("#letter-form").addEventListener("submit", async event=>{event.preventDefault(
 $("#letter-save-draft").addEventListener("click", async ()=>{await saveLetter("draft");});
 $("#letter-refresh").addEventListener("click",loadLetters);
 
+// Added relationship features. These use the existing mood cache and do not change authentication or database tables.
+function latestMoodRows() { return [...latestPerPerson(moodRowsCache || []).values()]; }
+function moodWord(score) { return moodLabels[score] || 'No mood saved yet'; }
+function renderTwoMoons() {
+  const latest = latestMoodRows();
+  const mine = latest.find(row => row.user_id === currentUser?.id);
+  const partner = latest.find(row => row.user_id !== currentUser?.id);
+  const setMoon = (id, row, label) => {
+    const node = document.getElementById(id); if (!node) return;
+    node.classList.remove('moon-low','moon-mid','moon-high','moon-empty');
+    node.classList.add(!row ? 'moon-empty' : row.score <= 4 ? 'moon-low' : row.score <= 7 ? 'moon-mid' : 'moon-high');
+    node.querySelector('span').textContent = label;
+    node.title = row ? `${label}: ${row.score}/10 — ${moodWord(row.score)}` : `${label}: no saved mood yet`;
+  };
+  setMoon('moon-you', mine, 'YOU'); setMoon('moon-partner', partner, 'YOUR PERSON');
+  const title = document.getElementById('moon-title'); const desc = document.getElementById('moon-description'); const details = document.getElementById('moon-details');
+  if (!mine && !partner) { title.textContent='Every feeling has a place here.'; desc.textContent='Save a mood check-in to let your moon reflect it.'; }
+  else if (mine && partner) { title.textContent = Math.abs(mine.score-partner.score) <= 2 ? 'Your moons are glowing in a similar rhythm.' : 'Different moons can share the same sky.'; desc.textContent = `Your latest moods are ${mine.score}/10 and ${partner.score}/10. Every feeling is welcome here.`; }
+  else { title.textContent='One moon is glowing so far.'; desc.textContent='When your person checks in too, both moons will appear together.'; }
+  details.replaceChildren();
+  [ [mine,'Your moon'], [partner,'Your person’s moon'] ].forEach(([row,label])=>{
+    const card=document.createElement('article'); card.className='moon-detail-card'; const h=document.createElement('h3'); h.textContent=label; const p=document.createElement('p'); p.className='muted small'; p.textContent=row?`${row.score}/10 · ${moodWord(row.score)} · ${formatDate(row.created_at)}`:'No saved check-in yet'; card.append(h,p);
+    if(row?.note){const note=document.createElement('p');note.className='moon-note';note.textContent=`“${row.note}”`;card.append(note);} details.append(card);
+  });
+}
+function renderConstellation() {
+  const host=document.getElementById('constellation-list'); if(!host)return; host.replaceChildren();
+  const events=[['21 July 2023','Our story began','The day your relationship started','♡','2023-07-21'],['17 July','Nisbat','A special date in your story','✧','07-17'],['25 January','Barne','Another star in your shared sky','✦','01-25'],['20 January','Fattumi’s birthday','A day to celebrate her','🎂','01-20'],['19 May','Juzzy’s birthday','A day to celebrate you','🎂','05-19']];
+  events.forEach(([date,title,copy,icon,key])=>{const item=document.createElement('article');item.className='constellation-event';const star=document.createElement('span');star.className='event-star';star.textContent=icon;const body=document.createElement('div');const h=document.createElement('h3');h.textContent=title;const p=document.createElement('p');p.className='muted small';p.textContent=copy;const d=document.createElement('span');d.className='constellation-date';d.textContent=date;body.append(h,p,d);item.append(star,body);host.append(item);});
+}
+const usIdeas=[
+ {title:'A 10-minute soft reset',copy:'Put your phones away, sit close, and each share one thing that felt heavy and one thing that felt good today.',tags:['Listen','No fixing','10 minutes'],kind:'gentle'},
+ {title:'Send a tiny voice note',copy:'Tell your person one specific thing you appreciated about them recently. Keep it simple and real.',tags:['Connection','Sweet surprise','2 minutes'],kind:'gentle'},
+ {title:'Build a tiny future plan',copy:'Choose one small thing to look forward to this week — a snack date, a call, a walk, or a shared episode.',tags:['Togetherness','Something to anticipate'],kind:'bright'},
+ {title:'Play a little game together',copy:'Open Games & Activities and play one quick round. Keep the goal to laugh, not to win.',tags:['Play','Light-hearted','Games'],kind:'bright'},
+ {title:'Make a calm shared playlist',copy:'Each add two songs: one that matches your mood and one that reminds you of the other person.',tags:['Music','Share a feeling'],kind:'gentle'},
+ {title:'Celebrate the ordinary',copy:'Share one small moment from today that you wish the other person could have seen.',tags:['Daily life','Feeling close'],kind:'bright'}
+];
+let lastUsIdea=-1;
+function renderUsAlgorithm(){
+ const latest=latestMoodRows(); const scores=latest.map(row=>Number(row.score)).filter(Number.isFinite); let pool=[0,1,2,3,4,5];
+ if(scores.length && scores.some(score=>score<=4)) pool=[0,1,4]; else if(scores.length && scores.every(score=>score>=8)) pool=[2,3,5];
+ let index=pool[Math.floor(Math.random()*pool.length)]; if(pool.length>1&&index===lastUsIdea) index=pool[(pool.indexOf(index)+1)%pool.length]; lastUsIdea=index;
+ const idea=usIdeas[index]; document.getElementById('algorithm-title').textContent=idea.title; document.getElementById('algorithm-copy').textContent=idea.copy;
+ const tags=document.getElementById('algorithm-tags'); tags.replaceChildren(); idea.tags.forEach(tag=>{const el=document.createElement('span');el.className='algorithm-tag';el.textContent=tag;tags.append(el);});
+}
+document.getElementById('moons-refresh')?.addEventListener('click',async()=>{await refreshMoods();renderTwoMoons();});
+document.getElementById('algorithm-refresh')?.addEventListener('click',renderUsAlgorithm);
+
 // Sidebar navigation and mobile drawer.
 function navigate(page) {
   document.querySelectorAll(".app-page").forEach(section => {
@@ -803,6 +853,9 @@ function navigate(page) {
   document.title = `${document.querySelector(`#page-${page}`)?.dataset.title || "Fuzzy World"} · Fuzzy World ♡`;
   closeMobileMenu();
   if (page === "moods") { refreshMoods(); renderMoodCalendar(); renderMoodDayDetail(selectedMoodDate); }
+  if (page === "twomoons") renderTwoMoons();
+  if (page === "constellation") renderConstellation();
+  if (page === "algorithm") renderUsAlgorithm();
   if (page === "questions" && currentUser && coupleId) loadQuestionDay(istDateKey(), true);
   if (page === "ask" && currentUser && coupleId) loadAskQuestions();
   if (page === "letters" && currentUser && coupleId) loadLetters();
