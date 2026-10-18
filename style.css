@@ -407,3 +407,31 @@ body { background:radial-gradient(circle at 15% 0%,#fff0f6 0,transparent 32%),va
   .relationship-panel { gap:12px; }
   .relationship-sparkle { display:none; }
 }
+
+/* Stage 2: dedicated mood calendar and searchable history */
+.mood-calendar-panel { overflow: hidden; }
+.mood-calendar-help { margin: 12px 0 16px; }
+.mood-calendar-day { position: relative; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0; min-height:42px; }
+.mood-calendar-day.has-mood { background: #fff0f6; border-color: #efb9d0; color: #874564; font-weight:700; }
+.mood-calendar-day .mood-day-dot { display:block; height:7px; line-height:7px; font-size:16px; color:#c75f91; margin-top:-1px; }
+.mood-calendar-day.selected { outline:2px solid var(--accent, #c86d96); outline-offset:1px; }
+.mood-day-detail { margin-top:12px; padding:16px; border:1px solid var(--border); border-radius:16px; background:rgba(255,255,255,.55); }
+.mood-detail-date { font-size:1rem; margin:0 0 10px; }
+.mood-detail-item { display:flex; align-items:flex-start; gap:12px; padding:12px 0; border-top:1px solid var(--border); }
+.mood-detail-item:first-of-type { border-top:0; }
+.mood-detail-score { flex:0 0 42px; }
+.mood-detail-content { min-width:0; }
+.mood-detail-content p { margin-top:0; }
+.mood-history-filters { display:grid; grid-template-columns:auto minmax(130px, 180px) auto minmax(160px, 1fr); align-items:center; gap:8px 12px; margin:16px 0 8px; }
+.mood-history-filters label { font-size:.85rem; color:var(--muted); }
+.mood-history-filters select,.mood-history-filters input { width:100%; min-width:0; border:1px solid var(--border); border-radius:12px; padding:10px 12px; background:var(--panel, #fff); color:inherit; font:inherit; }
+.history-heading { align-items:center; }
+.history-heading h2 { margin-bottom:4px; }
+.history-heading .muted { margin-bottom:0; }
+.history-person { font-weight:650; }
+@media (max-width:620px) {
+  .mood-history-filters { grid-template-columns:1fr; gap:6px; }
+  .mood-history-filters label:not(:first-child) { margin-top:8px; }
+  .mood-calendar-day { min-height:36px; }
+  .mood-day-detail { padding:12px; }
+}

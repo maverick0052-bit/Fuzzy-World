@@ -21,6 +21,9 @@ let selectedScore = null;
 let realtimeChannel = null;
 let loadingUserId = null;
 let savingMood = false;
+let moodRowsCache = [];
+let moodCalendarCursor = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+let selectedMoodDate = localDateKey(new Date());
 let calendarCursor = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 let selectedCalendarDate = new Date();
 
@@ -133,7 +136,7 @@ function showLoggedOut() {
   if (realtimeChannel) { supabase.removeChannel(realtimeChannel); realtimeChannel = null; }
   currentUser = null; coupleId = null; members = []; selectedScore = null; loadingUserId = null; savingMood = false;
   authPanel.hidden = false; appShell.hidden = true;
-  clear($("#mood-cards")); clear($("#mood-history"));
+  clear($("#mood-cards")); clear($("#mood-history")); moodRowsCache = [];
   $("#mood-note").value = ""; $("#save-mood").disabled = true;
   $("#mood-picker").querySelectorAll("button").forEach(button => {
     button.classList.remove("selected"); button.setAttribute("aria-pressed", "false");
@@ -170,7 +173,7 @@ async function handleSession(session) {
   loadingUserId = user.id; currentUser = user; coupleId = null; members = [];
   authPanel.hidden = true; appShell.hidden = false;
   setStatus(dashboardStatus, "Connecting to your shared space…");
-  clear($("#mood-cards")); clear($("#mood-history"));
+  clear($("#mood-cards")); clear($("#mood-history")); moodRowsCache = [];
   try {
     const { data: ownMembership, error: memberError } = await supabase
       .from("couple_members").select("couple_id, user_id, role").eq("user_id", user.id).maybeSingle();
@@ -205,12 +208,18 @@ async function refreshMoods() {
   if (!currentUser || !coupleId) return;
   const expectedUserId = currentUser.id;
   const expectedCoupleId = coupleId;
-  const { data, error } = await supabase.from("mood_updates")
-    .select("id, user_id, score, note, created_at").eq("couple_id", expectedCoupleId)
-    .order("created_at", { ascending: false }).limit(100);
-  if (error) { console.error("Mood refresh failed:", error); setStatus(dashboardStatus, "Couldn't refresh moods. Please retry."); return; }
+  const allRows = []; const pageSize = 500; let offset = 0;
+  while (true) {
+    const { data, error } = await supabase.from("mood_updates")
+      .select("id, user_id, score, note, created_at").eq("couple_id", expectedCoupleId)
+      .order("created_at", { ascending: false }).range(offset, offset + pageSize - 1);
+    if (error) { console.error("Mood refresh failed:", error); setStatus(dashboardStatus, "Couldn't refresh moods. Please retry."); return; }
+    allRows.push(...(data || []));
+    if (!data || data.length < pageSize) break;
+    offset += pageSize;
+  }
   if (currentUser?.id !== expectedUserId || coupleId !== expectedCoupleId) return;
-  renderMoodCards(data || []); renderMoodHistory(data || []);
+  moodRowsCache = allRows; renderMoodCards(moodRowsCache); renderMoodHistory(moodRowsCache); renderMoodCalendar(); renderMoodDayDetail(selectedMoodDate);
 }
 function getPersonName(userId) {
   if (userId === currentUser?.id) return "You";
@@ -244,16 +253,70 @@ function renderMoodCards(rows) {
 }
 function renderMoodHistory(rows) {
   const container = $("#mood-history"); clear(container);
-  if (!rows.length) { container.append(el("p", "muted", "No moods yet. Your first check-in starts your story ♡")); return; }
-  for (const mood of rows.slice(0, 50)) {
+  const personFilter = $("#mood-history-person")?.value || "all";
+  const search = ($("#mood-history-search")?.value || "").trim().toLowerCase();
+  const filtered = rows.filter(mood => {
+    const personMatch = personFilter === "all" || (personFilter === "me" ? mood.user_id === currentUser?.id : mood.user_id !== currentUser?.id);
+    return personMatch && (!search || (mood.note || "").toLowerCase().includes(search));
+  });
+  const count = $("#mood-history-count");
+  if (count) count.textContent = `${filtered.length} ${filtered.length === 1 ? "check-in" : "check-ins"} shown · newest first`;
+  if (!filtered.length) { container.append(el("p", "muted", rows.length ? "No check-ins match these filters." : "No moods yet. Your first check-in starts your story ♡")); return; }
+  for (const mood of filtered.slice(0, 100)) {
     const item = el("article", "history-item");
     const score = el("div", "history-score", mood.score);
     const main = el("div", "history-main");
-    main.append(el("p", "", `${getPersonName(mood.user_id)} · ${moodLabels[mood.score]}`), el("p", "timestamp", formatDate(mood.created_at)));
+    main.append(el("p", "history-person", `${getPersonName(mood.user_id)} · ${moodLabels[mood.score]}`), el("p", "timestamp", formatDate(mood.created_at)));
     if (mood.note) main.append(el("p", "note", mood.note));
     item.append(score, main); container.append(item);
   }
+  if (filtered.length > 100) container.append(el("p", "muted small", "Showing the latest 100 matching check-ins."));
 }
+function moodRowsForDate(dateKey) {
+  return moodRowsCache.filter(row => localDateKey(new Date(row.created_at)) === dateKey);
+}
+function renderMoodCalendar() {
+  const heading = $("#mood-calendar-month"); const grid = $("#mood-calendar-days");
+  if (!heading || !grid) return;
+  const year = moodCalendarCursor.getFullYear(), month = moodCalendarCursor.getMonth();
+  heading.textContent = new Intl.DateTimeFormat("en-IN", { month: "long", year: "numeric" }).format(moodCalendarCursor);
+  clear(grid);
+  const first = new Date(year, month, 1); const offset = (first.getDay() + 6) % 7;
+  const start = new Date(year, month, 1 - offset);
+  for (let i = 0; i < 42; i++) {
+    const date = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+    const key = localDateKey(date); const rows = moodRowsForDate(key);
+    const button = el("button", "calendar-day mood-calendar-day", String(date.getDate()));
+    if (date.getMonth() !== month) button.classList.add("outside");
+    if (sameDay(date, new Date())) button.classList.add("today");
+    if (rows.length) button.classList.add("has-mood");
+    if (key === selectedMoodDate) button.classList.add("selected");
+    button.setAttribute("aria-label", `${new Intl.DateTimeFormat("en-IN", { dateStyle: "full" }).format(date)}${rows.length ? `, ${rows.length} mood check-in(s)` : ", no mood check-ins"}`);
+    if (rows.length) button.append(el("span", "mood-day-dot", "•"));
+    button.addEventListener("click", () => { selectedMoodDate = key; if (date.getMonth() !== moodCalendarCursor.getMonth()) moodCalendarCursor = new Date(date.getFullYear(), date.getMonth(), 1); renderMoodCalendar(); renderMoodDayDetail(key); });
+    grid.append(button);
+  }
+}
+function renderMoodDayDetail(dateKey) {
+  const box = $("#mood-day-detail"); if (!box) return; clear(box);
+  const date = parseDateKey(dateKey); const rows = moodRowsForDate(dateKey);
+  box.append(el("h3", "mood-detail-date", new Intl.DateTimeFormat("en-IN", { dateStyle: "full" }).format(date)));
+  if (!rows.length) { box.append(el("p", "muted small", "No saved mood check-ins for this date. Every day is still part of your story ♡")); return; }
+  for (const mood of rows) {
+    const item = el("article", "mood-detail-item");
+    item.append(el("span", "history-score mood-detail-score", String(mood.score)));
+    const content = el("div", "mood-detail-content");
+    content.append(el("p", "history-person", `${getPersonName(mood.user_id)} · ${moodLabels[mood.score]}`), el("p", "timestamp", formatDate(mood.created_at)));
+    if (mood.note) content.append(el("p", "note", mood.note));
+    item.append(content); box.append(item);
+  }
+}
+$("#mood-calendar-prev")?.addEventListener("click", () => { moodCalendarCursor = new Date(moodCalendarCursor.getFullYear(), moodCalendarCursor.getMonth() - 1, 1); renderMoodCalendar(); });
+$("#mood-calendar-next")?.addEventListener("click", () => { moodCalendarCursor = new Date(moodCalendarCursor.getFullYear(), moodCalendarCursor.getMonth() + 1, 1); renderMoodCalendar(); });
+$("#mood-history-person")?.addEventListener("change", () => renderMoodHistory(moodRowsCache));
+$("#mood-history-search")?.addEventListener("input", () => renderMoodHistory(moodRowsCache));
+$("#mood-history-refresh")?.addEventListener("click", () => refreshMoods());
+
 function subscribeToMoods(id) {
   if (realtimeChannel) supabase.removeChannel(realtimeChannel);
   realtimeChannel = supabase.channel(`moods-${id}`).on("postgres_changes", {
@@ -286,7 +349,7 @@ function navigate(page) {
   document.querySelectorAll(".nav-item[data-page]").forEach(button => button.classList.toggle("active", button.dataset.page === page));
   document.title = `${document.querySelector(`#page-${page}`)?.dataset.title || "Fuzzy World"} · Fuzzy World ♡`;
   closeMobileMenu();
-  if (page === "moods") refreshMoods();
+  if (page === "moods") { refreshMoods(); renderMoodCalendar(); renderMoodDayDetail(selectedMoodDate); }
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 document.querySelectorAll(".nav-item[data-page]").forEach(button => button.addEventListener("click", () => navigate(button.dataset.page)));
@@ -361,7 +424,7 @@ function renderCalendar() {
 }
 $("#calendar-prev").addEventListener("click", () => { calendarCursor = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth() - 1, 1); renderCalendar(); });
 $("#calendar-next").addEventListener("click", () => { calendarCursor = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth() + 1, 1); renderCalendar(); });
-updateRelationshipCounter(); renderCalendar();
+updateRelationshipCounter(); renderCalendar(); renderMoodCalendar(); renderMoodDayDetail(selectedMoodDate);
 
 supabase.auth.onAuthStateChange((event, session) => {
   if (event === "SIGNED_OUT" || !session) { showLoggedOut(); return; }
