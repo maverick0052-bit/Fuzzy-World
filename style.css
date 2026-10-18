@@ -465,3 +465,15 @@ body { background:radial-gradient(circle at 15% 0%,#fff0f6 0,transparent 32%),va
 .question-history-day { border:1px solid var(--border); border-radius:12px; padding:9px 12px; background:#fff; color:#8d6076; font:inherit; font-size:12px; cursor:pointer; }
 .question-history-day.active,.question-history-day:hover { background:#c05f88; border-color:#c05f88; color:#fff; }
 @media(max-width:620px) { .question-intro { align-items:flex-start; padding:18px; } .question-heart { flex-basis:42px; width:42px; height:42px; font-size:25px; } .question-card { padding:13px; } .question-panel .section-heading { align-items:flex-start; } }
+
+
+/* Stage 3.1: side-by-side MCQ answer review */
+.mcq-comparison-list { display:grid; gap:13px; }
+.mcq-comparison-card { border:1px solid var(--border); border-radius:16px; padding:15px; background:linear-gradient(135deg,#fffafd,#fbf8ff); }
+.mcq-comparison-card h3 { margin:5px 0 12px; font-size:15px; line-height:1.5; }
+.mcq-comparison-answers { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+.mcq-answer-person { min-width:0; padding:12px; border-radius:12px; background:#fff; border:1px solid var(--border); }
+.mcq-answer-person strong { display:block; color:#a6537a; font-size:12px; margin-bottom:6px; }
+.mcq-answer-person p { margin:0; font-size:13px; overflow-wrap:anywhere; line-height:1.5; }
+.mcq-match,.mcq-different { margin:10px 0 0; font-size:12px; color:#9b5276; }
+@media(max-width:520px) { .mcq-comparison-answers { grid-template-columns:1fr; } }

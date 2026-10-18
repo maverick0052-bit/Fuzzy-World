@@ -535,11 +535,46 @@ function renderQuestionDay() {
   $("#shared-answer-input").disabled = !isToday || !!ownWrittenAnswer || !written;
   $("#save-shared-answer").hidden = !isToday;
   $("#save-shared-answer").disabled = savingQuestionAnswers || !written || !!ownWrittenAnswer;
+  renderMcqComparison(mine, partnerId);
   renderSharedAnswerReveal(written, partnerId);
   if (ownWrittenAnswer) setStatus($("#shared-question-status"), "Your written answer is saved ♡");
   else setStatus($("#shared-question-status"), "");
   setStatus($("#my-question-status"), "");
 }
+function renderMcqComparison(questions, partnerId) {
+  const box = $("#mcq-comparison-list");
+  if (!box) return;
+  clear(box);
+  if (!questions.length || !partnerId) {
+    box.append(el("p", "muted", "Your shared questions will appear here once both accounts are connected."));
+    return;
+  }
+  let revealed = 0;
+  questions.forEach((question, index) => {
+    const mine = answerFor(question.id, currentUser.id);
+    const partner = answerFor(question.id, partnerId);
+    const card = el("article", "mcq-comparison-card");
+    card.append(el("p", "question-number", `Question ${index + 1}`));
+    card.append(el("h3", "", question.prompt));
+    if (mine && partner) {
+      revealed++;
+      const grid = el("div", "mcq-comparison-answers");
+      const own = el("div", "mcq-answer-person");
+      own.append(el("strong", "", "Your answer ♡"), el("p", "", mine.answer));
+      const their = el("div", "mcq-answer-person");
+      their.append(el("strong", "", `${personLabel(partnerId)}'s answer ♡`), el("p", "", partner.answer));
+      grid.append(own, their); card.append(grid);
+      if (mine.answer === partner.answer) card.append(el("p", "mcq-match", "You chose the same answer! ♡"));
+      else card.append(el("p", "mcq-different", "Different answers — something to talk about together ♡"));
+    } else {
+      const status = !mine && !partner ? "Neither of you has answered this one yet." : !mine ? "Your answer is still needed before the comparison is revealed." : "Waiting for your person to answer this question.";
+      card.append(el("p", "answer-waiting", status));
+    }
+    box.append(card);
+  });
+  if (!revealed) box.prepend(el("p", "muted small", "Comparisons unlock one question at a time after both partners answer."));
+}
+
 function renderSharedAnswerReveal(written, partnerId) {
   const box = $("#shared-answer-reveal"); clear(box);
   if (!written) return;
