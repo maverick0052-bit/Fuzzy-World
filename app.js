@@ -417,21 +417,15 @@ function seededShuffle(items, seed) {
   return result;
 }
 function makeDailyQuestionPayload(dateKey) {
-  const orderedMembers = [...members].sort((a, b) => a.user_id.localeCompare(b.user_id));
+  // One shared set of five MCQs, plus one shared written prompt for both partners.
   const seed = stableHash(`${coupleId}:${dateKey}`);
-  const picked = seededShuffle(dailyQuestionBank, seed).slice(0, 10);
-  const payload = [];
-  for (let slot = 1; slot <= 5; slot++) {
-    const q = picked[slot - 1];
-    payload.push({ slot_no: slot, audience_user_id: orderedMembers[0].user_id, question_type: "mcq", prompt: q.prompt, options: q.options });
-    const other = picked[slot + 4];
-    payload.push({ slot_no: slot, audience_user_id: orderedMembers[1].user_id, question_type: "mcq", prompt: other.prompt, options: other.options });
-  }
+  const picked = seededShuffle(dailyQuestionBank, seed).slice(0, 5);
+  const payload = picked.map((q, index) => ({ slot_no: index + 1, audience_user_id: null, question_type: "mcq", prompt: q.prompt, options: q.options }));
   const written = seededShuffle(sharedWrittenBank, seed ^ 0x9e3779b9)[0];
   payload.push({ slot_no: 0, audience_user_id: null, question_type: "written", prompt: written, options: [] });
   return payload;
 }
-function ownQuestionRows(rows = activeQuestionRows) { return rows.filter(row => row.question_type === "mcq" && row.audience_user_id === currentUser?.id).sort((a,b) => a.slot_no - b.slot_no); }
+function ownQuestionRows(rows = activeQuestionRows) { return rows.filter(row => row.question_type === "mcq").sort((a,b) => a.slot_no - b.slot_no); }
 function answerFor(questionId, userId = currentUser?.id, rows = activeQuestionAnswers) { return rows.find(row => row.question_id === questionId && row.user_id === userId); }
 function otherMemberId() { return members.find(member => member.user_id !== currentUser?.id)?.user_id || null; }
 function personLabel(userId) { return userId === currentUser?.id ? "You" : "Fattumi"; }
@@ -452,7 +446,7 @@ async function ensureQuestionSet(dateKey) {
   }
   const { data: existingQuestions, error: questionError } = await supabase.from("daily_questions").select("id, set_id, slot_no, audience_user_id, question_type, prompt, options").eq("set_id", set.id);
   if (questionError) throw questionError;
-  if ((existingQuestions || []).length < 11) {
+  if ((existingQuestions || []).length < 6) {
     const payload = makeDailyQuestionPayload(dateKey).map(question => ({ ...question, set_id: set.id }));
     const { error: seedError } = await supabase.from("daily_questions").upsert(payload, { onConflict: "set_id,slot_no,audience_user_id", ignoreDuplicates: true });
     if (seedError) throw seedError;
@@ -523,8 +517,7 @@ function renderQuestionDay() {
       card.append(options);
       if (!isToday) card.append(el("p", "question-locked", "Past-day answers are read-only."));
       if (saved && partnerId) {
-        const partnerQuestion = activeQuestionRows.find(row => row.question_type === "mcq" && row.audience_user_id === partnerId && row.slot_no === question.slot_no);
-        const partnerAnswer = partnerQuestion ? answerFor(partnerQuestion.id, partnerId) : null;
+        const partnerAnswer = answerFor(question.id, partnerId);
         const reveal = el("div", "answer-reveal");
         if (partnerAnswer) { const bubble = el("div", "answer-bubble"); bubble.append(el("strong", "", "Your person's answer ♡"), el("p", "", partnerAnswer.answer)); reveal.append(bubble); }
         else reveal.append(el("p", "answer-waiting", "Your answer is saved. Your person's answer will appear here after they answer this question. ♡"));
